@@ -27,7 +27,7 @@ type (
 
 	PostgresConfig struct {
 		Host     string `mapstructure:"host" validate:"required,hostname"`
-		Port     int    `mapstructure:"port" validate:"required,port"`
+		Port     int    `mapstructure:"port" validate:"required,gt=0,lt=65536"`
 		User     string `mapstructure:"user" validate:"required"`     // TODO: add custom validator
 		Password string `mapstructure:"password" validate:"required"` // TODO: add custom validator
 		DBName   string `mapstructure:"db_name" validate:"required"`
@@ -36,7 +36,7 @@ type (
 
 	ServerConfig struct {
 		Host string `mapstructure:"host" validate:"required,hostname"`
-		Port int    `mapstructure:"port" validate:"required,port"`
+		Port int    `mapstructure:"port" validate:"required,gt=0,lt=65536"`
 	}
 
 	LoggerConfig struct {
@@ -49,12 +49,12 @@ type (
 	}
 )
 
-func (c *Config) GetLoggerConfig(module string) ComponentLoggerConfig {
-	if loggerCfg, ok := c.Logger.Modules[module]; ok {
+func (lc *LoggerConfig) GetLoggerConfig(module string) ComponentLoggerConfig {
+	if loggerCfg, ok := lc.Modules[module]; ok {
 		return loggerCfg
 	}
 	log.Warn().Str("module", module).Msg("Not found logger config for module")
-	return c.Logger.Default
+	return lc.Default
 }
 
 func (d *PostgresConfig) GetDSN() string {
@@ -65,7 +65,7 @@ func (d *PostgresConfig) GetDSN() string {
 	return DSN + "?sslmode=disable"
 }
 
-func Load() *Config {
+func Load() (*Config, error) {
 	// Initialize Viper
 	viperConfig := viper.New()
 
@@ -86,22 +86,23 @@ func Load() *Config {
 
 	// Read raw config
 	if err := viperConfig.ReadInConfig(); err != nil {
-		log.Fatal().Err(err).Msg("Failed to read config")
-		return nil
+		log.Error().Err(err).Msg("Failed to read config")
+		return nil, err
 	}
 
 	// Unmarshal config
 	config := new(Config)
-	if err := viperConfig.Unmarshal(&viperConfig); err != nil {
-		log.Fatal().Err(err).Msg("Failed to unmarshal config")
-		return nil
+	if err := viperConfig.Unmarshal(&config); err != nil {
+		log.Error().Err(err).Msg("Failed to unmarshal config")
+		return nil, err
 	}
 
 	// Validate config
 	validate := validator.New()
 	if err := validate.Struct(config); err != nil {
-		log.Fatal().Err(err).Msg("Failed to validate config")
+		log.Error().Err(err).Msg("Failed to validate config")
+		return nil, err
 	}
 
-	return config
+	return config, nil
 }

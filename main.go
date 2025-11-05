@@ -13,6 +13,7 @@ import (
 	"github.com/Irurnnen/go-gin-template/internal/server"
 	"github.com/Irurnnen/go-gin-template/internal/services"
 	"github.com/Irurnnen/go-gin-template/pkg/logger"
+	"github.com/rs/zerolog/log"
 )
 
 //	@title			go-gin-template
@@ -22,14 +23,17 @@ import (
 
 func main() {
 	// Read config
-	cfg := config.Load()
+	cfg, err := config.Load()
+	if err != nil {
+		log.Fatal().Err(err).Msg("Failed to get config")
+	}
 
 	// Setup logger
 	log := logger.New(cfg.Logger.Default)
 	log.Info().Msg("Logger setup successfully")
 
 	// Initialize database
-	repoLog := logger.New(cfg.GetLoggerConfig("hello_repository"))
+	repoLog := logger.New(cfg.Logger.GetLoggerConfig("hello_repository"))
 	repo, err := repository.NewRepository(cfg.PostgresConfig.GetDSN(), repoLog)
 	if err != nil {
 		log.Fatal().Err(err).Msg("Failed to initialize database")
@@ -44,13 +48,13 @@ func main() {
 	log.Info().Msg("Database connection ping successfully")
 
 	// Initialize Hello handler
-	HelloServiceLogger := logger.New(cfg.GetLoggerConfig("hello_service"))
+	HelloServiceLogger := logger.New(cfg.Logger.GetLoggerConfig("hello_service"))
 	HelloService := services.NewHelloService(repo.HelloRepository, HelloServiceLogger)
-	HelloHandlerLogger := logger.New(cfg.GetLoggerConfig("hello_handler"))
+	HelloHandlerLogger := logger.New(cfg.Logger.GetLoggerConfig("hello_handler"))
 	HelloHandler := handler.NewHelloHandler(HelloService, HelloHandlerLogger)
 
 	// Setup server
-	srvLogger := logger.New(cfg.GetLoggerConfig("http"))
+	srvLogger := logger.New(cfg.Logger.GetLoggerConfig("http"))
 	srv := server.NewServer(cfg.ServerConfig, srvLogger, HelloHandler)
 	log.Debug().Msg("Server created successfully")
 
