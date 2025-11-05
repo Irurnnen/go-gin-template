@@ -3,18 +3,18 @@ package repository
 import (
 	_ "github.com/jackc/pgx/stdlib"
 	"github.com/jmoiron/sqlx"
-	"go.uber.org/zap"
+	"github.com/rs/zerolog"
 )
 
 const DriverName = "pgx"
 
 type Repository struct {
 	db              *sqlx.DB
-	logger          *zap.Logger
+	logger          *zerolog.Logger
 	HelloRepository HelloRepositoryInterface
 }
 
-func NewRepository(DSN string, logger *zap.Logger) (*Repository, error) {
+func NewRepository(DSN string, logger *zerolog.Logger) (*Repository, error) {
 	db, err := sqlx.Connect(DriverName, DSN)
 	if err != nil {
 		return nil, err
@@ -27,7 +27,7 @@ func NewRepository(DSN string, logger *zap.Logger) (*Repository, error) {
 	}, nil
 }
 
-func NewRepositoryDB(db *sqlx.DB, logger *zap.Logger) *Repository {
+func NewRepositoryDB(db *sqlx.DB, logger *zerolog.Logger) *Repository {
 	return &Repository{
 		db:              db,
 		logger:          logger,

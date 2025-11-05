@@ -9,12 +9,11 @@ import (
 
 	"github.com/Irurnnen/go-gin-template/internal/config"
 	"github.com/Irurnnen/go-gin-template/internal/handler"
-	"github.com/Irurnnen/go-gin-template/internal/logger"
 	"github.com/Irurnnen/go-gin-template/internal/repository"
 	"github.com/Irurnnen/go-gin-template/internal/server"
 	"github.com/Irurnnen/go-gin-template/internal/services"
+	"github.com/Irurnnen/go-gin-template/pkg/logger"
 	"github.com/gin-gonic/gin"
-	"go.uber.org/zap"
 )
 
 //	@title			go-gin-template
@@ -28,21 +27,21 @@ func main() {
 
 	// Setup logger
 	log := logger.New(cfg.LogLevel)
-	log.Info("Logger setup successfully")
+	log.Info().Msg("Logger setup successfully")
 
 	// Initialize database
 	repo, err := repository.NewRepository(cfg.DatabaseConfig.GetDSN(), log)
 	if err != nil {
-		log.Fatal("Failed to initialize database", zap.Error(err))
+		log.Fatal().Err(err).Msg("Failed to initialize database")
 	}
-	log.Info("Database setup successfully")
+	log.Info().Msg("Database setup successfully")
 	defer repo.Close()
 
 	// Ping database
 	if err := repo.Ping(); err != nil {
-		log.Fatal("Failed to ping database", zap.Error(err), zap.String("host", cfg.DatabaseConfig.Host))
+		log.Fatal().Err(err).Str("host", cfg.DatabaseConfig.Host).Msg("Failed to ping database")
 	}
-	log.Info("Database connection ping successfully")
+	log.Info().Msg("Database connection ping successfully")
 
 	// Initialize Hello handler
 	HelloService := services.NewHelloService(repo.HelloRepository, log)
@@ -57,12 +56,12 @@ func main() {
 
 	// Setup server
 	srv := server.NewServer(cfg.ServerConfig, log, HelloHandler)
-	log.Debug("Server created successfully")
+	log.Debug().Msg("Server created successfully")
 
 	// Launch application
 	go func() {
 		if err := srv.Start(); err != nil {
-			log.Fatal("Application failed to run", zap.Error(err))
+			log.Fatal().Err(err).Msg("Application failed to run")
 		}
 	}()
 
@@ -75,11 +74,11 @@ func main() {
 	defer cancel()
 
 	if err := srv.Shutdown(ctx); err != nil {
-		log.Error("Server shutdown", zap.Error(err))
+		log.Error().Err(err).Msg("Server shutdown")
 	}
 
 	<-ctx.Done()
 
-	log.Warn("Timeout of 5 seconds")
-	log.Info("Server exiting")
+	log.Warn().Msg("Timeout of 5 seconds")
+	log.Info().Msg("Server exiting")
 }

@@ -2,19 +2,19 @@ package services
 
 import (
 	"github.com/Irurnnen/go-gin-template/internal/repository"
-	"go.uber.org/zap"
+	"github.com/rs/zerolog"
 )
 
 type HelloService struct {
 	repo   repository.HelloRepositoryInterface
-	logger *zap.Logger
+	logger *zerolog.Logger
 }
 
 type HelloServiceInterface interface {
 	GetHelloMessage() (string, error)
 }
 
-func NewHelloService(repo repository.HelloRepositoryInterface, logger *zap.Logger) *HelloService {
+func NewHelloService(repo repository.HelloRepositoryInterface, logger *zerolog.Logger) *HelloService {
 	return &HelloService{
 		repo:   repo,
 		logger: logger,

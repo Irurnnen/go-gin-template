@@ -5,8 +5,8 @@ import (
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/jmoiron/sqlx"
+	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/assert"
-	"go.uber.org/zap"
 )
 
 func TestRepository_Ping(t *testing.T) {
@@ -19,8 +19,8 @@ func TestRepository_Ping(t *testing.T) {
 	mock.ExpectPing()
 
 	// Initialize repository
-	logger := zap.NewNop()
-	repo := NewRepositoryDB(sqlx.NewDb(db, "sqlmock"), logger)
+	logger := zerolog.Nop()
+	repo := NewRepositoryDB(sqlx.NewDb(db, "sqlmock"), &logger)
 
 	// Call method
 	err = repo.Ping()

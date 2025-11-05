@@ -2,19 +2,19 @@ package repository
 
 import (
 	"github.com/jmoiron/sqlx"
-	"go.uber.org/zap"
+	"github.com/rs/zerolog"
 )
 
 type HelloRepository struct {
 	db     *sqlx.DB
-	logger *zap.Logger
+	logger *zerolog.Logger
 }
 
 type HelloRepositoryInterface interface {
 	GetHelloMessage() (string, error)
 }
 
-func NewHelloRepository(db *sqlx.DB, logger *zap.Logger) *HelloRepository {
+func NewHelloRepository(db *sqlx.DB, logger *zerolog.Logger) *HelloRepository {
 	return &HelloRepository{
 		db:     db,
 		logger: logger,
@@ -26,7 +26,7 @@ func (r *HelloRepository) GetHelloMessage() (string, error) {
 	query := "SELECT 'Hello World' AS message"
 	err := r.db.Get(&message, query)
 	if err != nil {
-		zap.Error(err)
+		r.logger.Error().Err(err).Msg("Failed to execute query")
 		return "", err
 	}
 	return message, nil

@@ -8,7 +8,7 @@ import (
 	"github.com/Irurnnen/go-gin-template/internal/config"
 	"github.com/Irurnnen/go-gin-template/internal/handler"
 	"github.com/gin-gonic/gin"
-	"go.uber.org/zap"
+	"github.com/rs/zerolog"
 )
 
 type ServerInterface interface {
@@ -17,11 +17,11 @@ type ServerInterface interface {
 }
 
 type Server struct {
-	logger     *zap.Logger
+	logger     *zerolog.Logger
 	httpServer *http.Server
 }
 
-func NewServer(cfg *config.ServerConfig, logger *zap.Logger, helloHandler handler.HelloHandlerInterface) *Server {
+func NewServer(cfg *config.ServerConfig, logger *zerolog.Logger, helloHandler handler.HelloHandlerInterface) *Server {
 	// Create a new Gin router instance
 
 	router := gin.New()
@@ -46,7 +46,7 @@ func NewServer(cfg *config.ServerConfig, logger *zap.Logger, helloHandler handle
 		v1.GET("/hello", helloHandler.GetHelloMessage)
 	}
 
-	logger.Debug("Router initialized")
+	logger.Debug().Msg("Router initialized")
 
 	return &Server{
 		logger: logger,
@@ -58,19 +58,19 @@ func NewServer(cfg *config.ServerConfig, logger *zap.Logger, helloHandler handle
 }
 
 func (s *Server) Start() error {
-	s.logger.Info("Starting server", zap.String("address", s.httpServer.Addr))
+	s.logger.Info().Str("address", s.httpServer.Addr).Msg("Starting server")
 	if err := s.httpServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-		s.logger.Error("Server failed to start", zap.Error(err))
+		s.logger.Error().Err(err).Msg("Server failed to start")
 		return err
 	}
-	s.logger.Info("Server started successfully")
+	s.logger.Info().Msg("Server started successfully")
 	return nil
 }
 
 func (s *Server) Shutdown(ctx context.Context) error {
-	s.logger.Info("Shutting down server...")
+	s.logger.Info().Msg("Shutting down server...")
 	if err := s.httpServer.Shutdown(ctx); err != nil {
-		s.logger.Error("Server failed to shutdown", zap.Error(err))
+		s.logger.Error().Err(err).Msg("Server failed to shutdown")
 		return err
 	}
 	return nil

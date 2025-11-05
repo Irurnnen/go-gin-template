@@ -6,19 +6,19 @@ import (
 	"github.com/Irurnnen/go-gin-template/internal/models"
 	"github.com/Irurnnen/go-gin-template/internal/services"
 	"github.com/gin-gonic/gin"
-	"go.uber.org/zap"
+	"github.com/rs/zerolog"
 )
 
 type HelloHandler struct {
 	service services.HelloServiceInterface
-	logger  *zap.Logger
+	logger  *zerolog.Logger
 }
 
 type HelloHandlerInterface interface {
 	GetHelloMessage(c *gin.Context)
 }
 
-func NewHelloHandler(service services.HelloServiceInterface, logger *zap.Logger) *HelloHandler {
+func NewHelloHandler(service services.HelloServiceInterface, logger *zerolog.Logger) *HelloHandler {
 	return &HelloHandler{
 		service: service,
 		logger:  logger,
@@ -35,14 +35,14 @@ func NewHelloHandler(service services.HelloServiceInterface, logger *zap.Logger)
 //	@Failure		500	{object}	models.HTTPError
 //	@Router			/hello [GET]
 func (h *HelloHandler) GetHelloMessage(c *gin.Context) {
-	h.logger.Debug("Get hello message in handler")
+	h.logger.Debug().Msg("Get hello message in handler")
 
 	message, err := h.service.GetHelloMessage()
 	switch err {
 	case nil:
 		break
 	default:
-		h.logger.Error("Failed to get hello message", zap.Error(err))
+		h.logger.Error().Err(err).Msg("Failed to get hello message")
 		c.AbortWithStatusJSON(http.StatusInternalServerError, models.HTTPError{Error: "unknown error", Message: "Unknown internal error"})
 		return
 	}

@@ -3,8 +3,8 @@ package config
 import (
 	"fmt"
 
+	"github.com/rs/zerolog/log"
 	"github.com/spf13/viper"
-	"go.uber.org/zap"
 )
 
 type Config struct {
@@ -59,13 +59,13 @@ func NewConfig() *Config {
 	viper.SetConfigType("yaml")
 
 	if err := viper.ReadInConfig(); err != nil {
-		zap.L().Error("Failed to read config, using example config", zap.Error(err))
+		log.Fatal().Err(err).Msg("Failed to read config")
 		return NewConfigExample()
 	}
 
 	var config Config
 	if err := viper.Unmarshal(&config); err != nil {
-		zap.L().Error("Failed to parse config, using example config", zap.Error(err))
+		log.Fatal().Err(err).Msg("Failed to parse config")
 		return NewConfigExample()
 	}
 

@@ -6,9 +6,9 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
+	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	"go.uber.org/zap"
 )
 
 type MockHelloService struct {
@@ -26,8 +26,8 @@ func TestHelloHandler_GetHelloMessage(t *testing.T) {
 	mockService.On("GetHelloMessage").Return("Hello World", nil)
 
 	// Init handler
-	logger := zap.NewNop()
-	handler := NewHelloHandler(mockService, logger)
+	logger := zerolog.Nop()
+	handler := NewHelloHandler(mockService, &logger)
 
 	gin.SetMode(gin.TestMode)
 	router := gin.New()
