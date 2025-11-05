@@ -3,8 +3,8 @@ package handler
 import (
 	"net/http"
 
-	"github.com/Irurnnen/gin-template/internal/models"
-	"github.com/Irurnnen/gin-template/internal/services"
+	"github.com/Irurnnen/go-gin-template/internal/models"
+	"github.com/Irurnnen/go-gin-template/internal/services"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )

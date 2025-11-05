@@ -7,17 +7,17 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/Irurnnen/gin-template/internal/config"
-	"github.com/Irurnnen/gin-template/internal/handler"
-	"github.com/Irurnnen/gin-template/internal/logger"
-	"github.com/Irurnnen/gin-template/internal/repository"
-	"github.com/Irurnnen/gin-template/internal/server"
-	"github.com/Irurnnen/gin-template/internal/services"
+	"github.com/Irurnnen/go-gin-template/internal/config"
+	"github.com/Irurnnen/go-gin-template/internal/handler"
+	"github.com/Irurnnen/go-gin-template/internal/logger"
+	"github.com/Irurnnen/go-gin-template/internal/repository"
+	"github.com/Irurnnen/go-gin-template/internal/server"
+	"github.com/Irurnnen/go-gin-template/internal/services"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
 
-//	@title			Gin-template
+//	@title			go-gin-template
 //	@version		0.0.1
 //	@description	This is a sample server celler server.
 

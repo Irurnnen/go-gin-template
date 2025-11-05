@@ -21,6 +21,6 @@ RUN --mount=type=cache,target="/root/.cache/go-build" GOOS=linux go build --ldfl
 FROM alpine:3.21.3 AS production-stage
 
 WORKDIR /app
-COPY --from=build-stage /app/gin-template /app/gin-template
+COPY --from=build-stage /app/go-gin-template /app/go-gin-template
 
-CMD [ "./gin-template" ]
+CMD [ "./go-gin-template" ]

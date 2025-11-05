@@ -55,7 +55,7 @@ func NewConfigExample() *Config {
 
 func NewConfig() *Config {
 	viper.AddConfigPath("/run/secrets")
-	viper.SetConfigName("gin-template")
+	viper.SetConfigName("go-gin-template")
 	viper.SetConfigType("yaml")
 
 	if err := viper.ReadInConfig(); err != nil {

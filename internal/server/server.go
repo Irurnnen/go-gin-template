@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/Irurnnen/gin-template/internal/config"
-	"github.com/Irurnnen/gin-template/internal/handler"
+	"github.com/Irurnnen/go-gin-template/internal/config"
+	"github.com/Irurnnen/go-gin-template/internal/handler"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )

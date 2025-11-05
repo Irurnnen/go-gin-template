@@ -2,7 +2,7 @@
     "swagger": "2.0",
     "info": {
         "description": "This is a sample server celler server.",
-        "title": "Gin-template",
+        "title": "go-gin-template",
         "contact": {},
         "version": "0.0.1"
     },

@@ -1,4 +1,4 @@
-module github.com/Irurnnen/gin-template
+module github.com/Irurnnen/go-gin-template
 
 go 1.24.2
 
