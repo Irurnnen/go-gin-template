@@ -2,20 +2,30 @@ package config
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/viper"
 )
 
+const (
+	DefaultConfigPath = "/run/secrets"
+	DefaultConfigName = "shop-api"
+	ConfigType        = "yml"
+	EnvPrefix         = "shop-api"
+	EnvConfigPath     = "CONFIG_PATH"
+	EnvConfigName     = "CONFIG_NAME"
+)
+
 type (
 	Config struct {
 		ServerConfig   *ServerConfig   `mapstructure:"server" validate:"required"`
-		DatabaseConfig *DatabaseConfig `mapstructure:"database" validate:"required"`
+		PostgresConfig *PostgresConfig `mapstructure:"database" validate:"required"`
 		LogLevel       string          `mapstructure:"log_level" validate:"omitempty"`
 	}
 
-	DatabaseConfig struct {
+	PostgresConfig struct {
 		Host     string `mapstructure:"host" validate:"required,hostname"`
 		Port     int    `mapstructure:"port" validate:"required,port"`
 		User     string `mapstructure:"user" validate:"required"`     // TODO: add custom validator
@@ -30,7 +40,7 @@ type (
 	}
 )
 
-func (d *DatabaseConfig) GetDSN() string {
+func (d *PostgresConfig) GetDSN() string {
 	DSN := fmt.Sprintf("postgresql://%s:%s@%s:%d/%s", d.User, d.Password, d.Host, d.Port, d.DBName)
 	if d.Secure {
 		return DSN
@@ -38,26 +48,42 @@ func (d *DatabaseConfig) GetDSN() string {
 	return DSN + "?sslmode=disable"
 }
 
-func NewConfig() *Config {
-	viper.AddConfigPath("/run/secrets")
-	viper.SetConfigName("go-gin-template")
-	viper.SetConfigType("yaml")
+func Load() *Config {
+	// Initialize Viper
+	viper_config := viper.New()
 
-	if err := viper.ReadInConfig(); err != nil {
+	// Set env overriding
+	viper_config.AutomaticEnv()
+	viper_config.SetEnvPrefix(EnvPrefix)
+	viper_config.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+
+	// Set defaults for config initialization
+	viper_config.SetDefault("config.name", DefaultConfigName)
+	viper_config.SetDefault("config.path", DefaultConfigPath)
+	viper_config.SetDefault("config.type", ConfigType)
+
+	// Set config path
+	viper_config.AddConfigPath(viper_config.GetString("config.path"))
+	viper_config.SetConfigType(viper_config.GetString("config.type"))
+	viper_config.SetConfigName(viper_config.GetString("config.name"))
+
+	// Read raw config
+	if err := viper_config.ReadInConfig(); err != nil {
 		log.Fatal().Err(err).Msg("Failed to read config")
 		return nil
 	}
 
+	// Unmarshal config
 	config := new(Config)
-	if err := viper.Unmarshal(&config); err != nil {
-		log.Fatal().Err(err).Msg("Failed to parse config")
+	if err := viper_config.Unmarshal(&viper_config); err != nil {
+		log.Fatal().Err(err).Msg("Failed to unmarshal config")
 		return nil
 	}
 
+	// Validate config
 	validate := validator.New()
 	if err := validate.Struct(config); err != nil {
 		log.Fatal().Err(err).Msg("Failed to validate config")
-		return nil
 	}
 
 	return config

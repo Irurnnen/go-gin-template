@@ -13,7 +13,6 @@ import (
 	"github.com/Irurnnen/go-gin-template/internal/server"
 	"github.com/Irurnnen/go-gin-template/internal/services"
 	"github.com/Irurnnen/go-gin-template/pkg/logger"
-	"github.com/gin-gonic/gin"
 )
 
 //	@title			go-gin-template
@@ -23,14 +22,14 @@ import (
 
 func main() {
 	// Read config
-	cfg := config.NewConfig()
+	cfg := config.Load()
 
 	// Setup logger
 	log := logger.New(cfg.LogLevel)
 	log.Info().Msg("Logger setup successfully")
 
 	// Initialize database
-	repo, err := repository.NewRepository(cfg.DatabaseConfig.GetDSN(), log)
+	repo, err := repository.NewRepository(cfg.PostgresConfig.GetDSN(), log)
 	if err != nil {
 		log.Fatal().Err(err).Msg("Failed to initialize database")
 	}
@@ -39,20 +38,13 @@ func main() {
 
 	// Ping database
 	if err := repo.Ping(); err != nil {
-		log.Fatal().Err(err).Str("host", cfg.DatabaseConfig.Host).Msg("Failed to ping database")
+		log.Fatal().Err(err).Str("host", cfg.PostgresConfig.Host).Msg("Failed to ping database")
 	}
 	log.Info().Msg("Database connection ping successfully")
 
 	// Initialize Hello handler
 	HelloService := services.NewHelloService(repo.HelloRepository, log)
 	HelloHandler := handler.NewHelloHandler(HelloService, log)
-
-	// Setup gin level
-	if cfg.Debug {
-		gin.SetMode(gin.DebugMode)
-	} else {
-		gin.SetMode(gin.ReleaseMode)
-	}
 
 	// Setup server
 	srv := server.NewServer(cfg.ServerConfig, log, HelloHandler)
