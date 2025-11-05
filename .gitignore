@@ -29,3 +29,7 @@ go-gin-template.yml
 
 # IDE metadata
 .[Vv][Ss][Cc]ode*
+
+# Extra swagger files
+docs/
+!docs/swagger.json

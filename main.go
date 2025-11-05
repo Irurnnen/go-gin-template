@@ -19,10 +19,9 @@ import (
 
 //	@title			go-gin-template
 //	@version		0.0.1
-//	@description	This is a sample server celler server.
+//	@description	This is a sample server caller server.
+//	@server			http://localhost:8080/v1
 
-// @host		localhost:8080
-// @BasePath	/v1
 func main() {
 	// Read config
 	cfg := config.NewConfig()
