@@ -22,7 +22,7 @@ type (
 	Config struct {
 		ServerConfig   *ServerConfig   `mapstructure:"server" validate:"required"`
 		PostgresConfig *PostgresConfig `mapstructure:"database" validate:"required"`
-		LogLevel       string          `mapstructure:"log_level" validate:"omitempty"`
+		Logger         *LoggerConfig   `mapstructure:"log_level" validate:"omitempty"`
 	}
 
 	PostgresConfig struct {
@@ -38,7 +38,24 @@ type (
 		Host string `mapstructure:"host" validate:"required,hostname"`
 		Port int    `mapstructure:"port" validate:"required,port"`
 	}
+
+	LoggerConfig struct {
+		Default ComponentLoggerConfig            `mapstructure:"default" validate:"omitempty"`
+		Modules map[string]ComponentLoggerConfig `mapstructure:"modules" validate:"omitempty"`
+	}
+
+	ComponentLoggerConfig struct {
+		Level string `mapstructure:"level" validate:"required,oneof=trace debug info warn error fatal panic"`
+	}
 )
+
+func (c *Config) GetLoggerConfig(module string) ComponentLoggerConfig {
+	if loggerCfg, ok := c.Logger.Modules[module]; ok {
+		return loggerCfg
+	}
+	log.Warn().Str("module", module).Msg("Not found logger config for module")
+	return c.Logger.Default
+}
 
 func (d *PostgresConfig) GetDSN() string {
 	DSN := fmt.Sprintf("postgresql://%s:%s@%s:%d/%s", d.User, d.Password, d.Host, d.Port, d.DBName)
@@ -50,32 +67,32 @@ func (d *PostgresConfig) GetDSN() string {
 
 func Load() *Config {
 	// Initialize Viper
-	viper_config := viper.New()
+	viperConfig := viper.New()
 
 	// Set env overriding
-	viper_config.AutomaticEnv()
-	viper_config.SetEnvPrefix(EnvPrefix)
-	viper_config.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+	viperConfig.AutomaticEnv()
+	viperConfig.SetEnvPrefix(EnvPrefix)
+	viperConfig.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 
 	// Set defaults for config initialization
-	viper_config.SetDefault("config.name", DefaultConfigName)
-	viper_config.SetDefault("config.path", DefaultConfigPath)
-	viper_config.SetDefault("config.type", ConfigType)
+	viperConfig.SetDefault("config.name", DefaultConfigName)
+	viperConfig.SetDefault("config.path", DefaultConfigPath)
+	viperConfig.SetDefault("config.type", ConfigType)
 
 	// Set config path
-	viper_config.AddConfigPath(viper_config.GetString("config.path"))
-	viper_config.SetConfigType(viper_config.GetString("config.type"))
-	viper_config.SetConfigName(viper_config.GetString("config.name"))
+	viperConfig.AddConfigPath(viperConfig.GetString("config.path"))
+	viperConfig.SetConfigType(viperConfig.GetString("config.type"))
+	viperConfig.SetConfigName(viperConfig.GetString("config.name"))
 
 	// Read raw config
-	if err := viper_config.ReadInConfig(); err != nil {
+	if err := viperConfig.ReadInConfig(); err != nil {
 		log.Fatal().Err(err).Msg("Failed to read config")
 		return nil
 	}
 
 	// Unmarshal config
 	config := new(Config)
-	if err := viper_config.Unmarshal(&viper_config); err != nil {
+	if err := viperConfig.Unmarshal(&viperConfig); err != nil {
 		log.Fatal().Err(err).Msg("Failed to unmarshal config")
 		return nil
 	}

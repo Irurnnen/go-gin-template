@@ -25,15 +25,16 @@ func main() {
 	cfg := config.Load()
 
 	// Setup logger
-	log := logger.New(cfg.LogLevel)
+	log := logger.New(cfg.Logger.Default)
 	log.Info().Msg("Logger setup successfully")
 
 	// Initialize database
-	repo, err := repository.NewRepository(cfg.PostgresConfig.GetDSN(), log)
+	repoLog := logger.New(cfg.GetLoggerConfig("hello_repository"))
+	repo, err := repository.NewRepository(cfg.PostgresConfig.GetDSN(), repoLog)
 	if err != nil {
 		log.Fatal().Err(err).Msg("Failed to initialize database")
 	}
-	log.Info().Msg("Database setup successfully")
+	repoLog.Info().Msg("Database setup successfully")
 	defer repo.Close()
 
 	// Ping database
@@ -43,11 +44,14 @@ func main() {
 	log.Info().Msg("Database connection ping successfully")
 
 	// Initialize Hello handler
-	HelloService := services.NewHelloService(repo.HelloRepository, log)
-	HelloHandler := handler.NewHelloHandler(HelloService, log)
+	HelloServiceLogger := logger.New(cfg.GetLoggerConfig("hello_service"))
+	HelloService := services.NewHelloService(repo.HelloRepository, HelloServiceLogger)
+	HelloHandlerLogger := logger.New(cfg.GetLoggerConfig("hello_handler"))
+	HelloHandler := handler.NewHelloHandler(HelloService, HelloHandlerLogger)
 
 	// Setup server
-	srv := server.NewServer(cfg.ServerConfig, log, HelloHandler)
+	srvLogger := logger.New(cfg.GetLoggerConfig("http"))
+	srv := server.NewServer(cfg.ServerConfig, srvLogger, HelloHandler)
 	log.Debug().Msg("Server created successfully")
 
 	// Launch application

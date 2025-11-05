@@ -3,6 +3,7 @@ package logger
 import (
 	"os"
 
+	"github.com/Irurnnen/go-gin-template/internal/config"
 	"github.com/rs/zerolog"
 )
 
@@ -12,10 +13,10 @@ func init() {
 }
 
 // New get new entity of zerolog logger by logLevel
-func New(logLevel string) *zerolog.Logger {
+func New(logConfig config.ComponentLoggerConfig) *zerolog.Logger {
 	level := zerolog.InfoLevel
 
-	switch logLevel {
+	switch logConfig.Level {
 	case "trace":
 		level = zerolog.TraceLevel
 	case "debug":
