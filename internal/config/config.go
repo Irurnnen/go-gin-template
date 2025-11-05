@@ -36,23 +36,6 @@ type ServerConfig struct {
 	Port int    `mapstructure:"port"`
 }
 
-func NewConfigExample() *Config {
-	return &Config{
-		ServerConfig: &ServerConfig{
-			Host: "0.0.0.0",
-			Port: 8080,
-		},
-		DatabaseConfig: &DatabaseConfig{
-			Host:     "hostname",
-			Port:     5432,
-			User:     "user",
-			Password: "password",
-			DBName:   "dbname",
-		},
-		LogLevel: "production",
-	}
-}
-
 func NewConfig() *Config {
 	viper.AddConfigPath("/run/secrets")
 	viper.SetConfigName("go-gin-template")
@@ -60,20 +43,14 @@ func NewConfig() *Config {
 
 	if err := viper.ReadInConfig(); err != nil {
 		log.Fatal().Err(err).Msg("Failed to read config")
-		return NewConfigExample()
+		return nil
 	}
 
 	var config Config
 	if err := viper.Unmarshal(&config); err != nil {
 		log.Fatal().Err(err).Msg("Failed to parse config")
-		return NewConfigExample()
+		return nil
 	}
 
 	return &config
-}
-
-func NewConfigDebug() *Config {
-	Config := NewConfig()
-	Config.Debug = true // Set debug mode to true
-	return Config       // Return the modified config
 }
