@@ -3,6 +3,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        - BUILD_TAG=${BUILD_TAG}
     container_name: go-gin-template
     restart: unless-stopped
     ports:
