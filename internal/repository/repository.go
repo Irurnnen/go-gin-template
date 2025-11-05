@@ -8,11 +8,13 @@ import (
 
 const DriverName = "pgx"
 
-type Repository struct {
-	db              *sqlx.DB
-	logger          *zerolog.Logger
-	HelloRepository HelloRepositoryInterface
-}
+type (
+	Repository struct {
+		db              *sqlx.DB
+		logger          *zerolog.Logger
+		HelloRepository HelloRepositoryInterface
+	}
+)
 
 func NewRepository(DSN string, logger *zerolog.Logger) (*Repository, error) {
 	db, err := sqlx.Connect(DriverName, DSN)

@@ -9,14 +9,16 @@ import (
 	"github.com/rs/zerolog"
 )
 
-type HelloHandler struct {
-	service services.HelloServiceInterface
-	logger  *zerolog.Logger
-}
+type (
+	HelloHandler struct {
+		service services.HelloServiceInterface
+		logger  *zerolog.Logger
+	}
 
-type HelloHandlerInterface interface {
-	GetHelloMessage(c *gin.Context)
-}
+	HelloHandlerInterface interface {
+		GetHelloMessage(c *gin.Context)
+	}
+)
 
 func NewHelloHandler(service services.HelloServiceInterface, logger *zerolog.Logger) *HelloHandler {
 	return &HelloHandler{
@@ -25,7 +27,7 @@ func NewHelloHandler(service services.HelloServiceInterface, logger *zerolog.Log
 	}
 }
 
-// GetHelloMessage godoc
+// GetHelloMessage
 //
 //	@Summary		Get Hello World message using database
 //	@Description	get hello world
@@ -34,15 +36,15 @@ func NewHelloHandler(service services.HelloServiceInterface, logger *zerolog.Log
 //	@Success		200	{object}	models.Message
 //	@Failure		500	{object}	models.HTTPError
 //	@Router			/hello [GET]
-func (h *HelloHandler) GetHelloMessage(c *gin.Context) {
-	h.logger.Debug().Msg("Get hello message in handler")
+func (hh *HelloHandler) GetHelloMessage(c *gin.Context) {
+	hh.logger.Debug().Msg("Get hello message in handler")
 
-	message, err := h.service.GetHelloMessage()
+	message, err := hh.service.GetHelloMessage()
 	switch err {
 	case nil:
 		break
 	default:
-		h.logger.Error().Err(err).Msg("Failed to get hello message")
+		hh.logger.Error().Err(err).Msg("Failed to get hello message")
 		c.AbortWithStatusJSON(http.StatusInternalServerError, models.HTTPError{Error: "unknown error", Message: "Unknown internal error"})
 		return
 	}

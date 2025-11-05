@@ -5,14 +5,16 @@ import (
 	"github.com/rs/zerolog"
 )
 
-type HelloService struct {
-	repo   repository.HelloRepositoryInterface
-	logger *zerolog.Logger
-}
+type (
+	HelloService struct {
+		repo   repository.HelloRepositoryInterface
+		logger *zerolog.Logger
+	}
 
-type HelloServiceInterface interface {
-	GetHelloMessage() (string, error)
-}
+	HelloServiceInterface interface {
+		GetHelloMessage() (string, error)
+	}
+)
 
 func NewHelloService(repo repository.HelloRepositoryInterface, logger *zerolog.Logger) *HelloService {
 	return &HelloService{

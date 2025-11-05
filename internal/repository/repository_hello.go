@@ -5,14 +5,16 @@ import (
 	"github.com/rs/zerolog"
 )
 
-type HelloRepository struct {
-	db     *sqlx.DB
-	logger *zerolog.Logger
-}
+type (
+	HelloRepository struct {
+		db     *sqlx.DB
+		logger *zerolog.Logger
+	}
 
-type HelloRepositoryInterface interface {
-	GetHelloMessage() (string, error)
-}
+	HelloRepositoryInterface interface {
+		GetHelloMessage() (string, error)
+	}
+)
 
 func NewHelloRepository(db *sqlx.DB, logger *zerolog.Logger) *HelloRepository {
 	return &HelloRepository{

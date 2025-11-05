@@ -11,15 +11,17 @@ import (
 	"github.com/rs/zerolog"
 )
 
-type ServerInterface interface {
-	Start() error
-	Shutdown() error
-}
+type (
+	ServerInterface interface {
+		Start() error
+		Shutdown() error
+	}
 
-type Server struct {
-	logger     *zerolog.Logger
-	httpServer *http.Server
-}
+	Server struct {
+		logger     *zerolog.Logger
+		httpServer *http.Server
+	}
+)
 
 func NewServer(cfg *config.ServerConfig, logger *zerolog.Logger, helloHandler handler.HelloHandlerInterface) *Server {
 	// Create a new Gin router instance
