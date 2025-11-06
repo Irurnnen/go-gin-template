@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"testing"
 
 	"github.com/pashagolub/pgxmock/v4"
@@ -25,7 +26,7 @@ func TestHelloRepository_GetHelloMessage(t *testing.T) {
 	repo := NewHelloRepository(mock, &logger)
 
 	// Call method
-	message, err := repo.GetHelloMessage()
+	message, err := repo.GetHelloMessage(context.Background())
 
 	// Assertions
 	assert.NoError(t, err)

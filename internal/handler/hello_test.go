@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"context"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -15,7 +16,7 @@ type MockHelloService struct {
 	mock.Mock
 }
 
-func (m *MockHelloService) GetHelloMessage() (string, error) {
+func (m *MockHelloService) GetHelloMessage(ctx context.Context) (string, error) {
 	args := m.Called()
 	return args.String(0), args.Error(1)
 }

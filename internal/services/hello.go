@@ -1,6 +1,8 @@
 package services
 
 import (
+	"context"
+
 	"github.com/Irurnnen/go-gin-template/internal/repository"
 	"github.com/rs/zerolog"
 )
@@ -12,7 +14,7 @@ type (
 	}
 
 	HelloServiceInterface interface {
-		GetHelloMessage() (string, error)
+		GetHelloMessage(context.Context) (string, error)
 	}
 )
 
@@ -23,8 +25,8 @@ func NewHelloService(repo repository.HelloRepositoryInterface, logger *zerolog.L
 	}
 }
 
-func (s *HelloService) GetHelloMessage() (string, error) {
-	message, err := s.repo.GetHelloMessage()
+func (s *HelloService) GetHelloMessage(ctx context.Context) (string, error) {
+	message, err := s.repo.GetHelloMessage(ctx)
 	if err != nil {
 		return "", err
 	}

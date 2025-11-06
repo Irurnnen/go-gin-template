@@ -14,7 +14,7 @@ type (
 	}
 
 	HelloRepositoryInterface interface {
-		GetHelloMessage() (string, error)
+		GetHelloMessage(context.Context) (string, error)
 	}
 )
 
@@ -25,10 +25,10 @@ func NewHelloRepository(db postgres.PgxPoolInterface, logger *zerolog.Logger) *H
 	}
 }
 
-func (r *HelloRepository) GetHelloMessage() (string, error) {
+func (r *HelloRepository) GetHelloMessage(ctx context.Context) (string, error) {
 	var message string
 	query := "SELECT 'Hello World' AS message"
-	row := r.db.QueryRow(context.Background(), query)
+	row := r.db.QueryRow(ctx, query)
 	err := row.Scan(&message)
 	if err != nil {
 		r.logger.Error().Err(err).Msg("Failed to execute query")

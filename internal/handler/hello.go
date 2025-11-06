@@ -39,7 +39,7 @@ func NewHelloHandler(service services.HelloServiceInterface, logger *zerolog.Log
 func (hh *HelloHandler) GetHelloMessage(c *gin.Context) {
 	hh.logger.Debug().Msg("Get hello message in handler")
 
-	message, err := hh.service.GetHelloMessage()
+	message, err := hh.service.GetHelloMessage(c.Request.Context())
 	switch err {
 	case nil:
 		break
