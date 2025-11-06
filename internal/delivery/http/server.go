@@ -46,9 +46,9 @@ func New(cfg *ServerConfig, logger *zerolog.Logger, globalMW ...gin.HandlerFunc)
 	}
 }
 
-func (s *Server) RegisterRoutes(regiserFns ...func(*gin.RouterGroup)) {
+func (s *Server) RegisterRoutes(registerFns ...func(*gin.RouterGroup)) {
 	api := s.engine.Group("/")
-	for _, fn := range regiserFns {
+	for _, fn := range registerFns {
 		fn(api)
 	}
 }
