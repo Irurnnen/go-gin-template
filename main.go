@@ -13,6 +13,7 @@ import (
 	"github.com/Irurnnen/go-gin-template/internal/server"
 	"github.com/Irurnnen/go-gin-template/internal/services"
 	"github.com/Irurnnen/go-gin-template/pkg/logger"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/rs/zerolog/log"
 )
 
@@ -29,39 +30,39 @@ func main() {
 	}
 
 	// Setup logger
-	log := logger.New(cfg.Logger.Default)
-	log.Info().Msg("Logger setup successfully")
+	defaultLogger := logger.New(cfg.Logger.Default)
+	defaultLogger.Info().Msg("Logger setup successfully")
 
 	// Initialize database
-	repoLog := logger.New(cfg.Logger.GetLoggerConfig("hello_repository"))
-	repo, err := repository.NewRepository(cfg.PostgresConfig.GetDSN(), repoLog)
+	dbPool, err := pgxpool.New(context.Background(), cfg.PostgresConfig.GetDSN())
 	if err != nil {
-		log.Fatal().Err(err).Msg("Failed to initialize database")
+		defaultLogger.Fatal().Err(err).Msg("Failed to initialize database connection pool")
 	}
-	repoLog.Info().Msg("Database setup successfully")
-	defer repo.Close()
+	defaultLogger.Info().Msg("Database connection pool setup successfully")
 
 	// Ping database
-	if err := repo.Ping(); err != nil {
-		log.Fatal().Err(err).Str("host", cfg.PostgresConfig.Host).Msg("Failed to ping database")
+	if err := dbPool.Ping(context.Background()); err != nil {
+		defaultLogger.Fatal().Err(err).Str("host", cfg.PostgresConfig.Host).Msg("Failed to ping database")
 	}
-	log.Info().Msg("Database connection ping successfully")
+	defaultLogger.Info().Msg("Database connection ping successfully")
 
 	// Initialize Hello handler
-	HelloServiceLogger := logger.New(cfg.Logger.GetLoggerConfig("hello_service"))
-	HelloService := services.NewHelloService(repo.HelloRepository, HelloServiceLogger)
-	HelloHandlerLogger := logger.New(cfg.Logger.GetLoggerConfig("hello_handler"))
-	HelloHandler := handler.NewHelloHandler(HelloService, HelloHandlerLogger)
+	helloRepositoryLogger := logger.New(cfg.Logger.GetLoggerConfig("hello_repository"))
+	helloRepository := repository.NewHelloRepository(dbPool, helloRepositoryLogger)
+	helloServiceLogger := logger.New(cfg.Logger.GetLoggerConfig("hello_service"))
+	helloService := services.NewHelloService(helloRepository, helloServiceLogger)
+	helloHandlerLogger := logger.New(cfg.Logger.GetLoggerConfig("hello_handler"))
+	helloHandler := handler.NewHelloHandler(helloService, helloHandlerLogger)
 
 	// Setup server
 	srvLogger := logger.New(cfg.Logger.GetLoggerConfig("http"))
-	srv := server.NewServer(cfg.ServerConfig, srvLogger, HelloHandler)
-	log.Debug().Msg("Server created successfully")
+	srv := server.NewServer(cfg.ServerConfig, srvLogger, helloHandler)
+	defaultLogger.Debug().Msg("Server created successfully")
 
 	// Launch application
 	go func() {
 		if err := srv.Start(); err != nil {
-			log.Fatal().Err(err).Msg("Application failed to run")
+			defaultLogger.Fatal().Err(err).Msg("Application failed to run")
 		}
 	}()
 
@@ -74,11 +75,11 @@ func main() {
 	defer cancel()
 
 	if err := srv.Shutdown(ctx); err != nil {
-		log.Error().Err(err).Msg("Server shutdown")
+		defaultLogger.Error().Err(err).Msg("Server shutdown")
 	}
 
 	<-ctx.Done()
 
-	log.Warn().Msg("Timeout of 5 seconds")
-	log.Info().Msg("Server exiting")
+	defaultLogger.Warn().Msg("Timeout of 5 seconds")
+	defaultLogger.Info().Msg("Server exiting")
 }

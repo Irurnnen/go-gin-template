@@ -1,13 +1,15 @@
 package repository
 
 import (
-	"github.com/jmoiron/sqlx"
+	"context"
+
+	"github.com/Irurnnen/go-gin-template/pkg/postgres"
 	"github.com/rs/zerolog"
 )
 
 type (
 	HelloRepository struct {
-		db     *sqlx.DB
+		db     postgres.PgxPoolInterface
 		logger *zerolog.Logger
 	}
 
@@ -16,7 +18,7 @@ type (
 	}
 )
 
-func NewHelloRepository(db *sqlx.DB, logger *zerolog.Logger) *HelloRepository {
+func NewHelloRepository(db postgres.PgxPoolInterface, logger *zerolog.Logger) *HelloRepository {
 	return &HelloRepository{
 		db:     db,
 		logger: logger,
@@ -26,7 +28,8 @@ func NewHelloRepository(db *sqlx.DB, logger *zerolog.Logger) *HelloRepository {
 func (r *HelloRepository) GetHelloMessage() (string, error) {
 	var message string
 	query := "SELECT 'Hello World' AS message"
-	err := r.db.Get(&message, query)
+	row := r.db.QueryRow(context.Background(), query)
+	err := row.Scan(&message)
 	if err != nil {
 		r.logger.Error().Err(err).Msg("Failed to execute query")
 		return "", err
