@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/Irurnnen/go-gin-template/internal/delivery/http"
 	"github.com/go-playground/validator/v10"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/viper"
@@ -20,9 +21,9 @@ const (
 
 type (
 	Config struct {
-		ServerConfig   *ServerConfig   `mapstructure:"server" validate:"required"`
-		PostgresConfig *PostgresConfig `mapstructure:"database" validate:"required"`
-		Logger         *LoggerConfig   `mapstructure:"logger" validate:"required"`
+		ServerConfig   *http.ServerConfig `mapstructure:"server" validate:"required"`
+		PostgresConfig *PostgresConfig    `mapstructure:"postgres" validate:"required"`
+		Logger         *LoggerConfig      `mapstructure:"logger" validate:"required"`
 	}
 
 	PostgresConfig struct {
@@ -31,10 +32,6 @@ type (
 		Password string `mapstructure:"password" validate:"required"` // TODO: add custom validator
 		DBName   string `mapstructure:"dbname" validate:"required"`
 		Secure   bool   `mapstructure:"secure" validate:"omitempty"`
-	}
-
-	ServerConfig struct {
-		Address string `mapstructure:"address" validate:"required,hostname_port"`
 	}
 
 	LoggerConfig struct {

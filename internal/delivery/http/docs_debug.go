@@ -1,7 +1,7 @@
 //go:build debug
 // +build debug
 
-package server
+package http
 
 import (
 	_ "github.com/Irurnnen/go-gin-template/docs"

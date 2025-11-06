@@ -3,7 +3,7 @@ package handler
 import (
 	"net/http"
 
-	"github.com/Irurnnen/go-gin-template/internal/models"
+	"github.com/Irurnnen/go-gin-template/internal/delivery/http/dto"
 	"github.com/Irurnnen/go-gin-template/internal/services"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog"
@@ -49,9 +49,9 @@ func (hh *HelloHandler) GetHelloMessage(c *gin.Context) {
 		break
 	default:
 		hh.logger.Error().Err(err).Msg("Failed to get hello message")
-		c.AbortWithStatusJSON(http.StatusInternalServerError, models.HTTPError{Error: "unknown error", Message: "Unknown internal error"})
+		c.AbortWithStatusJSON(http.StatusInternalServerError, dto.HTTPError{Error: "unknown error", Message: "Unknown internal error"})
 		return
 	}
 
-	c.JSON(http.StatusOK, models.Message{Message: message})
+	c.JSON(http.StatusOK, dto.Message{Message: message})
 }

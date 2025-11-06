@@ -14,13 +14,13 @@ func TestLoad_Success(t *testing.T) {
 
 	content := `server:
   address: localhost:8080
-database:
+postgres:
   address: db.local:5432
   user: "user"
   password: "pass"
-  db_name: "dbname"
+  dbname: "dbname"
   secure: false
-log_level:
+logger:
   default:
     level: "info"
   modules:
@@ -251,7 +251,7 @@ func TestPostgresConfig_GetDSN(t *testing.T) {
 				DBName:   "checkout",
 				Secure:   false,
 			},
-			want: "postgresql://irc:pass@localhost:8888/checkout?sslmode=disable",
+			want: "postgresql://irc:pass@localhost:8080/checkout?sslmode=disable",
 		},
 		{
 			name: "secure",

@@ -1,10 +1,9 @@
-package server
+package http
 
 import (
 	"context"
 	"net/http"
 
-	"github.com/Irurnnen/go-gin-template/internal/config"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog"
 )
@@ -16,14 +15,14 @@ type (
 	}
 
 	Server struct {
-		cfg        *config.ServerConfig
+		cfg        *ServerConfig
 		logger     *zerolog.Logger
 		engine     *gin.Engine
 		httpServer *http.Server
 	}
 )
 
-func New(cfg *config.ServerConfig, logger *zerolog.Logger, globalMW ...gin.HandlerFunc) *Server {
+func New(cfg *ServerConfig, logger *zerolog.Logger, globalMW ...gin.HandlerFunc) *Server {
 	// Set gin mode
 	gin.SetMode(gin.ReleaseMode)
 

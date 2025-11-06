@@ -8,9 +8,9 @@ import (
 	"time"
 
 	"github.com/Irurnnen/go-gin-template/internal/config"
-	"github.com/Irurnnen/go-gin-template/internal/handler"
+	"github.com/Irurnnen/go-gin-template/internal/delivery/http"
+	"github.com/Irurnnen/go-gin-template/internal/delivery/http/handler"
 	"github.com/Irurnnen/go-gin-template/internal/repository"
-	"github.com/Irurnnen/go-gin-template/internal/server"
 	"github.com/Irurnnen/go-gin-template/internal/services"
 	"github.com/Irurnnen/go-gin-template/pkg/logger"
 	"github.com/gin-gonic/gin"
@@ -57,7 +57,7 @@ func main() {
 	helloHandler := handler.NewHelloHandler(helloService, helloHandlerLogger)
 
 	srvLogger := logger.New(cfg.Logger.GetLoggerConfig("http_server"))
-	srv := server.New(
+	srv := http.New(
 		cfg.ServerConfig,
 		srvLogger,
 		gin.Logger(),   // TODO: write custom logger

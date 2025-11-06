@@ -1,7 +1,7 @@
 //go:build !debug
 // +build !debug
 
-package server
+package http
 
 import "github.com/gin-gonic/gin"
 
