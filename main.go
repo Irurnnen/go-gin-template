@@ -13,6 +13,7 @@ import (
 	"github.com/Irurnnen/go-gin-template/internal/server"
 	"github.com/Irurnnen/go-gin-template/internal/services"
 	"github.com/Irurnnen/go-gin-template/pkg/logger"
+	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/rs/zerolog/log"
 )
@@ -42,7 +43,7 @@ func main() {
 
 	// Ping database
 	if err := dbPool.Ping(context.Background()); err != nil {
-		defaultLogger.Fatal().Err(err).Str("host", cfg.PostgresConfig.Host).Msg("Failed to ping database")
+		defaultLogger.Fatal().Err(err).Str("address", cfg.PostgresConfig.Address).Msg("Failed to ping database")
 	}
 	defaultLogger.Info().Msg("Database connection ping successfully")
 
@@ -51,13 +52,20 @@ func main() {
 	helloRepository := repository.NewHelloRepository(dbPool, helloRepositoryLogger)
 	helloServiceLogger := logger.New(cfg.Logger.GetLoggerConfig("hello_service"))
 	helloService := services.NewHelloService(helloRepository, helloServiceLogger)
+
 	helloHandlerLogger := logger.New(cfg.Logger.GetLoggerConfig("hello_handler"))
 	helloHandler := handler.NewHelloHandler(helloService, helloHandlerLogger)
 
-	// Setup server
-	srvLogger := logger.New(cfg.Logger.GetLoggerConfig("http"))
-	srv := server.NewServer(cfg.ServerConfig, srvLogger, helloHandler)
-	defaultLogger.Debug().Msg("Server created successfully")
+	srvLogger := logger.New(cfg.Logger.GetLoggerConfig("http_server"))
+	srv := server.New(
+		cfg.ServerConfig,
+		srvLogger,
+		gin.Logger(),   // TODO: write custom logger
+		gin.Recovery(), // TODO: write custom recovery
+	)
+	srv.RegisterRoutes(
+		helloHandler.RegisterRoutes,
+	)
 
 	// Launch application
 	go func() {
@@ -66,20 +74,17 @@ func main() {
 		}
 	}()
 
-	// Graceful shutdown
 	quit := make(chan os.Signal, 1)
-	signal.Notify(quit, syscall.SIGINT, syscall.SIGKILL)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
+	defaultLogger.Info().Msg("Shutdown server...")
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
 	if err := srv.Shutdown(ctx); err != nil {
-		defaultLogger.Error().Err(err).Msg("Server shutdown")
+		defaultLogger.Error().Err(err).Msg("Failed shutdown server")
 	}
 
-	<-ctx.Done()
-
-	defaultLogger.Warn().Msg("Timeout of 5 seconds")
-	defaultLogger.Info().Msg("Server exiting")
+	defaultLogger.Info().Msg("Server exciting")
 }

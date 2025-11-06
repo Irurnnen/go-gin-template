@@ -3,10 +3,8 @@ package server
 import (
 	"context"
 	"net/http"
-	"strconv"
 
 	"github.com/Irurnnen/go-gin-template/internal/config"
-	"github.com/Irurnnen/go-gin-template/internal/handler"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog"
 )
@@ -18,49 +16,47 @@ type (
 	}
 
 	Server struct {
+		cfg        *config.ServerConfig
 		logger     *zerolog.Logger
+		engine     *gin.Engine
 		httpServer *http.Server
 	}
 )
 
-func NewServer(cfg *config.ServerConfig, logger *zerolog.Logger, helloHandler handler.HelloHandlerInterface) *Server {
-	// Create a new Gin router instance
+func New(cfg *config.ServerConfig, logger *zerolog.Logger, globalMW ...gin.HandlerFunc) *Server {
+	// Set gin mode
+	gin.SetMode(gin.ReleaseMode)
 
-	router := gin.New()
+	e := gin.New()
 
-	// Add middlewares
-	router.Use(
-		gin.Logger(),
-		gin.Recovery(),
-		// TODO: Add tracer
-	)
+	//
+	e.Use(globalMW...)
 
-	// Setup routes
-	v1 := router.Group("/v1")
-	{
-		internal := v1.Group("/internal")
-		{
-			internal.GET("/ping", func(c *gin.Context) {
-				c.JSON(200, gin.H{"message": "pong"})
-			})
-		}
+	AddDocsForDebugVersion(e)
 
-		v1.GET("/hello", helloHandler.GetHelloMessage)
+	srv := &http.Server{
+		Addr:    cfg.Address,
+		Handler: e,
 	}
 
-	logger.Debug().Msg("Router initialized")
-
 	return &Server{
-		logger: logger,
-		httpServer: &http.Server{
-			Addr:    cfg.Host + ":" + strconv.Itoa(cfg.Port),
-			Handler: router.Handler(),
-		},
+		logger:     logger,
+		cfg:        cfg,
+		engine:     e,
+		httpServer: srv,
+	}
+}
+
+func (s *Server) RegisterRoutes(regiserFns ...func(*gin.RouterGroup)) {
+	api := s.engine.Group("/")
+	for _, fn := range regiserFns {
+		fn(api)
 	}
 }
 
 func (s *Server) Start() error {
-	s.logger.Info().Str("address", s.httpServer.Addr).Msg("Starting server")
+	// TODO: add tls
+	s.logger.Info().Str("address", s.cfg.Address).Msg("HTTP server starting")
 	if err := s.httpServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 		s.logger.Error().Err(err).Msg("Server failed to start")
 		return err

@@ -27,6 +27,10 @@ func NewHelloHandler(service services.HelloServiceInterface, logger *zerolog.Log
 	}
 }
 
+func (hh *HelloHandler) RegisterRoutes(rg *gin.RouterGroup) {
+	rg.GET("/hello", hh.GetHelloMessage)
+}
+
 // GetHelloMessage
 //
 //	@Summary		Get Hello World message using database

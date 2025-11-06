@@ -13,11 +13,9 @@ func TestLoad_Success(t *testing.T) {
 	dir := t.TempDir()
 
 	content := `server:
-  host: "localhost"
-  port: 8080
+  address: localhost:8080
 database:
-  host: "db.local"
-  port: 5432
+  address: db.local:5432
   user: "user"
   password: "pass"
   db_name: "dbname"
@@ -61,12 +59,11 @@ log_level:
 	// ServerConfig
 	assert.NotNil(t, cfg)
 	assert.NotNil(t, cfg.ServerConfig)
-	assert.Equal(t, cfg.ServerConfig.Host, "localhost")
-	assert.Equal(t, cfg.ServerConfig.Port, 8080)
+	assert.Equal(t, cfg.ServerConfig.Address, "localhost:8080")
 
 	// PostgresConfig
 	assert.NotNil(t, cfg.PostgresConfig)
-	assert.Equal(t, cfg.PostgresConfig.Host, "db.local")
+	assert.Equal(t, cfg.PostgresConfig.Address, "db.local:5432")
 	assert.Equal(t, cfg.PostgresConfig.DBName, "dbname")
 
 	// logger default
@@ -248,8 +245,7 @@ func TestPostgresConfig_GetDSN(t *testing.T) {
 		{
 			name: "insecure",
 			pc: PostgresConfig{
-				Host:     "localhost",
-				Port:     8888,
+				Address:  "localhost:8080",
 				User:     "irc",
 				Password: "pass",
 				DBName:   "checkout",
@@ -260,12 +256,11 @@ func TestPostgresConfig_GetDSN(t *testing.T) {
 		{
 			name: "secure",
 			pc: PostgresConfig{
-				Host:     "postgres",
-				Port:     5432,
 				User:     "postgres",
 				Password: "passw0rd",
 				DBName:   "data",
 				Secure:   true,
+				Address:  "postgres:5432",
 			},
 			want: "postgresql://postgres:passw0rd@postgres:5432/data",
 		},

@@ -1,10 +1,7 @@
 {
     "components": {"schemas":{"models.HTTPError":{"properties":{"error":{"type":"string"},"message":{"type":"string"}},"type":"object"},"models.Message":{"properties":{"message":{"type":"string"}},"type":"object"}}},
-    "info": {"description":"This is a sample server celler server.","title":"go-gin-template","version":"0.0.1"},
+    "info": {"description":"This is a sample server caller server.","title":"go-gin-template","version":"0.0.1"},
     "externalDocs": {"description":"","url":""},
     "paths": {"/hello":{"get":{"description":"get hello world","responses":{"200":{"content":{"application/json":{"schema":{"$ref":"#/components/schemas/models.Message"}}},"description":"OK"},"500":{"content":{"application/json":{"schema":{"$ref":"#/components/schemas/models.HTTPError"}}},"description":"Internal Server Error"}},"summary":"Get Hello World message using database","tags":["Hello"]}}},
-    "openapi": "3.1.0",
-    "servers": [
-        {"url":"localhost:8080/v1"}
-    ]
+    "openapi": "3.1.0"
 }

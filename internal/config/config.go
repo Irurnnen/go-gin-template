@@ -13,7 +13,7 @@ const (
 	DefaultConfigPath = "/run/secrets"
 	DefaultConfigName = "shop-api"
 	ConfigType        = "yml"
-	EnvPrefix         = "shop-api"
+	EnvPrefix         = "shop_api"
 	EnvConfigPath     = "CONFIG_PATH"
 	EnvConfigName     = "CONFIG_NAME"
 )
@@ -22,25 +22,23 @@ type (
 	Config struct {
 		ServerConfig   *ServerConfig   `mapstructure:"server" validate:"required"`
 		PostgresConfig *PostgresConfig `mapstructure:"database" validate:"required"`
-		Logger         *LoggerConfig   `mapstructure:"log_level" validate:"omitempty"`
+		Logger         *LoggerConfig   `mapstructure:"logger" validate:"required"`
 	}
 
 	PostgresConfig struct {
-		Host     string `mapstructure:"host" validate:"required,hostname"`
-		Port     int    `mapstructure:"port" validate:"required,gt=0,lt=65536"`
+		Address  string `mapstructure:"address" validate:"required,hostname_port"`
 		User     string `mapstructure:"user" validate:"required"`     // TODO: add custom validator
 		Password string `mapstructure:"password" validate:"required"` // TODO: add custom validator
-		DBName   string `mapstructure:"db_name" validate:"required"`
+		DBName   string `mapstructure:"dbname" validate:"required"`
 		Secure   bool   `mapstructure:"secure" validate:"omitempty"`
 	}
 
 	ServerConfig struct {
-		Host string `mapstructure:"host" validate:"required,hostname"`
-		Port int    `mapstructure:"port" validate:"required,gt=0,lt=65536"`
+		Address string `mapstructure:"address" validate:"required,hostname_port"`
 	}
 
 	LoggerConfig struct {
-		Default ComponentLoggerConfig            `mapstructure:"default" validate:"omitempty"`
+		Default ComponentLoggerConfig            `mapstructure:"default" validate:"required"`
 		Modules map[string]ComponentLoggerConfig `mapstructure:"modules" validate:"omitempty"`
 	}
 
@@ -58,7 +56,7 @@ func (lc *LoggerConfig) GetLoggerConfig(module string) ComponentLoggerConfig {
 }
 
 func (d *PostgresConfig) GetDSN() string {
-	DSN := fmt.Sprintf("postgresql://%s:%s@%s:%d/%s", d.User, d.Password, d.Host, d.Port, d.DBName)
+	DSN := fmt.Sprintf("postgresql://%s:%s@%s/%s", d.User, d.Password, d.Address, d.DBName)
 	if d.Secure {
 		return DSN
 	}
@@ -86,21 +84,18 @@ func Load() (*Config, error) {
 
 	// Read raw config
 	if err := viperConfig.ReadInConfig(); err != nil {
-		log.Error().Err(err).Msg("Failed to read config")
 		return nil, err
 	}
 
 	// Unmarshal config
 	config := new(Config)
 	if err := viperConfig.Unmarshal(&config); err != nil {
-		log.Error().Err(err).Msg("Failed to unmarshal config")
 		return nil, err
 	}
 
 	// Validate config
 	validate := validator.New()
 	if err := validate.Struct(config); err != nil {
-		log.Error().Err(err).Msg("Failed to validate config")
 		return nil, err
 	}
 
