@@ -3,6 +3,8 @@ package postgres
 import (
 	"context"
 
+	"github.com/Irurnnen/go-gin-template/internal/services/hello"
+	"github.com/georgysavva/scany/v2/pgxscan"
 	"github.com/rs/zerolog"
 )
 
@@ -20,14 +22,16 @@ func NewHelloRepository(db PgxPoolInterface, logger *zerolog.Logger) *HelloRepos
 	}
 }
 
-func (r *HelloRepository) GetHelloMessage(ctx context.Context) (string, error) {
-	var message string
+func (r *HelloRepository) GetHelloMessage(ctx context.Context) (*hello.Message, error) {
+	message := new(Message)
 	query := "SELECT 'Hello World' AS message"
-	row := r.db.QueryRow(ctx, query)
-	err := row.Scan(&message)
+	err := pgxscan.Get(ctx, r.db, message, query)
 	if err != nil {
 		r.logger.Error().Err(err).Msg("Failed to execute query")
-		return "", err
+		return nil, err
 	}
-	return message, nil
+	serviceMessage := &hello.Message{
+		Message: message.Message,
+	}
+	return serviceMessage, nil
 }

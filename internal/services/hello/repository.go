@@ -4,6 +4,6 @@ import "context"
 
 type (
 	HelloRepositoryInterface interface {
-		GetHelloMessage(context.Context) (string, error)
+		GetHelloMessage(context.Context) (*Message, error)
 	}
 )

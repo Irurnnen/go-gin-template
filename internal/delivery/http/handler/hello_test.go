@@ -6,6 +6,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/Irurnnen/go-gin-template/internal/services/hello"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/assert"
@@ -16,15 +17,15 @@ type MockHelloService struct {
 	mock.Mock
 }
 
-func (m *MockHelloService) GetHelloMessage(ctx context.Context) (string, error) {
+func (m *MockHelloService) GetHelloMessage(ctx context.Context) (*hello.Message, error) {
 	args := m.Called()
-	return args.String(0), args.Error(1)
+	return args.Get(0).(*hello.Message), args.Error(1)
 }
 
 func TestHelloHandler_GetHelloMessage(t *testing.T) {
 	// Mock service
 	mockService := new(MockHelloService)
-	mockService.On("GetHelloMessage").Return("Hello World", nil)
+	mockService.On("GetHelloMessage").Return(&hello.Message{Message: "Hello World"}, nil)
 
 	// Init handler
 	logger := zerolog.Nop()

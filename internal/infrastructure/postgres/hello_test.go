@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/Irurnnen/go-gin-template/internal/services/hello"
 	"github.com/pashagolub/pgxmock/v4"
 	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/assert"
@@ -28,6 +29,6 @@ func TestHelloRepository_GetHelloMessage(t *testing.T) {
 
 	// Assertions
 	assert.NoError(t, err)
-	assert.Equal(t, "Hello World", message)
+	assert.Equal(t, &hello.Message{Message: "Hello World"}, message)
 	assert.NoError(t, mock.ExpectationsWereMet())
 }

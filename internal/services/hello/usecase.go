@@ -20,10 +20,10 @@ func NewHelloService(repo HelloRepositoryInterface, logger *zerolog.Logger) *Hel
 	}
 }
 
-func (s *HelloService) GetHelloMessage(ctx context.Context) (string, error) {
+func (s *HelloService) GetHelloMessage(ctx context.Context) (*Message, error) {
 	message, err := s.repo.GetHelloMessage(ctx)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	return message, nil
 }

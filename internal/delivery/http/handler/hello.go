@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/Irurnnen/go-gin-template/internal/delivery/http/dto"
+	"github.com/Irurnnen/go-gin-template/internal/services/hello"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog"
 )
@@ -20,7 +21,7 @@ type (
 	}
 
 	HelloServiceInterface interface {
-		GetHelloMessage(context.Context) (string, error)
+		GetHelloMessage(context.Context) (*hello.Message, error)
 	}
 )
 
@@ -57,5 +58,5 @@ func (hh *HelloHandler) GetHelloMessage(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, dto.Message{Message: message})
+	c.JSON(http.StatusOK, dto.Message{Message: message.Message})
 }
