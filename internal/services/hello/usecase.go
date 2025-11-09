@@ -1,4 +1,4 @@
-package services
+package hello
 
 import (
 	"context"
@@ -10,14 +10,6 @@ type (
 	HelloService struct {
 		repo   HelloRepositoryInterface
 		logger *zerolog.Logger
-	}
-
-	HelloServiceInterface interface {
-		GetHelloMessage(context.Context) (string, error)
-	}
-
-	HelloRepositoryInterface interface {
-		GetHelloMessage(context.Context) (string, error)
 	}
 )
 

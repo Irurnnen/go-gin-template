@@ -1,26 +1,30 @@
 package handler
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/Irurnnen/go-gin-template/internal/delivery/http/dto"
-	"github.com/Irurnnen/go-gin-template/internal/services"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog"
 )
 
 type (
 	HelloHandler struct {
-		service services.HelloServiceInterface
+		service HelloServiceInterface
 		logger  *zerolog.Logger
 	}
 
 	HelloHandlerInterface interface {
 		GetHelloMessage(c *gin.Context)
 	}
+
+	HelloServiceInterface interface {
+		GetHelloMessage(context.Context) (string, error)
+	}
 )
 
-func NewHelloHandler(service services.HelloServiceInterface, logger *zerolog.Logger) *HelloHandler {
+func NewHelloHandler(service HelloServiceInterface, logger *zerolog.Logger) *HelloHandler {
 	return &HelloHandler{
 		service: service,
 		logger:  logger,

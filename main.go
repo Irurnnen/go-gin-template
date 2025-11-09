@@ -11,7 +11,7 @@ import (
 	"github.com/Irurnnen/go-gin-template/internal/delivery/http"
 	"github.com/Irurnnen/go-gin-template/internal/delivery/http/handler"
 	"github.com/Irurnnen/go-gin-template/internal/infrastructure/postgres"
-	"github.com/Irurnnen/go-gin-template/internal/services"
+	"github.com/Irurnnen/go-gin-template/internal/services/hello"
 	"github.com/Irurnnen/go-gin-template/pkg/logger"
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -51,7 +51,7 @@ func main() {
 	helloRepositoryLogger := logger.New(cfg.Logger.GetLoggerConfig("hello_repository"))
 	helloRepository := postgres.NewHelloRepository(dbPool, helloRepositoryLogger)
 	helloServiceLogger := logger.New(cfg.Logger.GetLoggerConfig("hello_service"))
-	helloService := services.NewHelloService(helloRepository, helloServiceLogger)
+	helloService := hello.NewHelloService(helloRepository, helloServiceLogger)
 
 	helloHandlerLogger := logger.New(cfg.Logger.GetLoggerConfig("hello_handler"))
 	helloHandler := handler.NewHelloHandler(helloService, helloHandlerLogger)
