@@ -27,6 +27,7 @@ go.work.sum
 # Configuration files
 go-gin-template.yml
 .*.yml
+!.mockery.yml
 
 # IDE metadata
 .[Vv][Ss][Cc]ode*

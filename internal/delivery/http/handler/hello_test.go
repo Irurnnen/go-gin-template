@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"context"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -13,24 +12,19 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-type MockHelloService struct {
-	mock.Mock
-}
-
-func (m *MockHelloService) GetHelloMessage(ctx context.Context) (*hello.Message, error) {
-	args := m.Called()
-	return args.Get(0).(*hello.Message), args.Error(1)
-}
-
 func TestHelloHandler_GetHelloMessage(t *testing.T) {
 	// Mock service
-	mockService := new(MockHelloService)
-	mockService.On("GetHelloMessage").Return(&hello.Message{Message: "Hello World"}, nil)
+	mockService := NewMockHelloServiceInterface(t)
+	mockService.EXPECT().
+		GetHelloMessage(mock.Anything).
+		Return(&hello.Message{Message: "Hello World"}, nil).
+		Once()
 
 	// Init handler
 	logger := zerolog.Nop()
 	handler := NewHelloHandler(mockService, &logger)
 
+	// Init gin server
 	gin.SetMode(gin.TestMode)
 	router := gin.New()
 	router.GET("/v1/hello", handler.GetHelloMessage)

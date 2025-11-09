@@ -1,0 +1,21 @@
+all: false
+template: testify
+dir: "{{.InterfaceDir}}"
+filename: mocks_test.go
+force-file-write: true
+formatter: goimports
+include-auto-generated: false
+log-level: info
+structname: "{{.Mock}}{{.InterfaceName}}"
+pkgname: "{{.SrcPackageName}}"
+recursive: false
+require-template-schema-exists: true
+template-schema: "{{.Template}}.schema.json"
+packages:
+  github.com/Irurnnen/go-gin-template/internal/delivery/http/handler:
+    interfaces:
+      HelloHandlerInterface:
+      HelloServiceInterface:
+  github.com/Irurnnen/go-gin-template/internal/services/hello:
+    interfaces:
+      HelloRepositoryInterface:
