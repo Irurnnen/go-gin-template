@@ -1,10 +1,10 @@
 package config
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/Irurnnen/go-gin-template/internal/delivery/http"
+	"github.com/Irurnnen/go-gin-template/internal/infrastructure/postgres"
 	"github.com/go-playground/validator/v10"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/viper"
@@ -21,17 +21,9 @@ const (
 
 type (
 	Config struct {
-		ServerConfig   *http.ServerConfig `mapstructure:"server" validate:"required"`
-		PostgresConfig *PostgresConfig    `mapstructure:"postgres" validate:"required"`
-		Logger         *LoggerConfig      `mapstructure:"logger" validate:"required"`
-	}
-
-	PostgresConfig struct {
-		Address  string `mapstructure:"address" validate:"required,hostname_port"`
-		User     string `mapstructure:"user" validate:"required"`     // TODO: add custom validator
-		Password string `mapstructure:"password" validate:"required"` // TODO: add custom validator
-		DBName   string `mapstructure:"dbname" validate:"required"`
-		Secure   bool   `mapstructure:"secure" validate:"omitempty"`
+		ServerConfig   *http.ServerConfig       `mapstructure:"server" validate:"required"`
+		PostgresConfig *postgres.PostgresConfig `mapstructure:"postgres" validate:"required"`
+		Logger         *LoggerConfig            `mapstructure:"logger" validate:"required"`
 	}
 
 	LoggerConfig struct {
@@ -50,14 +42,6 @@ func (lc *LoggerConfig) GetLoggerConfig(module string) ComponentLoggerConfig {
 	}
 	log.Warn().Str("module", module).Msg("Not found logger config for module")
 	return lc.Default
-}
-
-func (d *PostgresConfig) GetDSN() string {
-	DSN := fmt.Sprintf("postgresql://%s:%s@%s/%s", d.User, d.Password, d.Address, d.DBName)
-	if d.Secure {
-		return DSN
-	}
-	return DSN + "?sslmode=disable"
 }
 
 func Load() (*Config, error) {

@@ -1,24 +1,19 @@
-package repository
+package postgres
 
 import (
 	"context"
 
-	"github.com/Irurnnen/go-gin-template/pkg/postgres"
 	"github.com/rs/zerolog"
 )
 
 type (
 	HelloRepository struct {
-		db     postgres.PgxPoolInterface
+		db     PgxPoolInterface
 		logger *zerolog.Logger
-	}
-
-	HelloRepositoryInterface interface {
-		GetHelloMessage(context.Context) (string, error)
 	}
 )
 
-func NewHelloRepository(db postgres.PgxPoolInterface, logger *zerolog.Logger) *HelloRepository {
+func NewHelloRepository(db PgxPoolInterface, logger *zerolog.Logger) *HelloRepository {
 	return &HelloRepository{
 		db:     db,
 		logger: logger,

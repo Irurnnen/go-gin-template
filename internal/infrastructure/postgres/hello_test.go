@@ -1,4 +1,4 @@
-package repository
+package postgres
 
 import (
 	"context"
@@ -16,8 +16,6 @@ func TestHelloRepository_GetHelloMessage(t *testing.T) {
 	defer mock.Close()
 
 	// Mock query
-	// rows := sqlmock.NewRows([]string{"message"}).AddRow("Hello World")
-	// mock.ExpectQuery("SELECT 'Hello World' AS message").WillReturnRows(rows)
 	rows := pgxmock.NewRows([]string{"message"}).AddRow("Hello World")
 	mock.ExpectQuery("SELECT 'Hello World' AS message").WillReturnRows(rows)
 
