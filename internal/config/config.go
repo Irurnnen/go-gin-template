@@ -5,8 +5,8 @@ import (
 
 	"github.com/Irurnnen/go-gin-template/internal/delivery/http"
 	"github.com/Irurnnen/go-gin-template/internal/infrastructure/postgres"
+	"github.com/Irurnnen/go-gin-template/pkg/logger"
 	"github.com/go-playground/validator/v10"
-	"github.com/rs/zerolog/log"
 	"github.com/spf13/viper"
 )
 
@@ -23,26 +23,9 @@ type (
 	Config struct {
 		ServerConfig   *http.ServerConfig       `mapstructure:"server" validate:"required"`
 		PostgresConfig *postgres.PostgresConfig `mapstructure:"postgres" validate:"required"`
-		Logger         *LoggerConfig            `mapstructure:"logger" validate:"required"`
-	}
-
-	LoggerConfig struct {
-		Default ComponentLoggerConfig            `mapstructure:"default" validate:"required"`
-		Modules map[string]ComponentLoggerConfig `mapstructure:"modules" validate:"omitempty"`
-	}
-
-	ComponentLoggerConfig struct {
-		Level string `mapstructure:"level" validate:"required,oneof=trace debug info warn error fatal panic"`
+		Logger         *logger.LoggerConfig     `mapstructure:"logger" validate:"required"`
 	}
 )
-
-func (lc *LoggerConfig) GetLoggerConfig(module string) ComponentLoggerConfig {
-	if loggerCfg, ok := lc.Modules[module]; ok {
-		return loggerCfg
-	}
-	log.Warn().Str("module", module).Msg("Not found logger config for module")
-	return lc.Default
-}
 
 func Load() (*Config, error) {
 	// Initialize Viper
