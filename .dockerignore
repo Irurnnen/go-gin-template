@@ -14,7 +14,7 @@ docker-compose.yml
 README.md
 
 # Examples
-gin-template-example.yml
+go-gin-template-example.yml
 .env.example
 
 # Exclude git history and configuration.

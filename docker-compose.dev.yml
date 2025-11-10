@@ -1,16 +1,18 @@
 services:
-  gin-template:
+  go-gin-template:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: gin-template
+      args:
+        - BUILD_TAG=${BUILD_TAG}
+    container_name: go-gin-template
     restart: unless-stopped
     ports:
       - "${PORT}:${PORT}"
     env_file:
       - .env
     secrets:
-      - gin-template.yml
+      - go-gin-template.yml
     depends_on:
       template-db:
         condition: service_healthy
@@ -28,7 +30,7 @@ services:
     volumes:
       - template-db-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}", "-d", "${POSTGRES_DB}"]
+      test: ["CMD", "pg_isready", "-U", "$$POSTGRES_USER", "-d", "$$POSTGRES_DB"]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -37,5 +39,5 @@ volumes:
   template-db-data:
 
 secrets:
-  gin-template.yml:
-    file: gin-template.yml
+  go-gin-template.yml:
+    file: go-gin-template.yml

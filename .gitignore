@@ -25,7 +25,13 @@ go.work.sum
 .env
 
 # Configuration files
-gin-template.yml
+go-gin-template.yml
+.*.yml
+!.mockery.yml
 
 # IDE metadata
 .[Vv][Ss][Cc]ode*
+
+# Extra swagger files
+docs/
+!docs/swagger.json

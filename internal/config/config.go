@@ -1,79 +1,67 @@
 package config
 
 import (
-	"fmt"
+	"strings"
 
+	"github.com/Irurnnen/go-gin-template/internal/delivery/http"
+	"github.com/Irurnnen/go-gin-template/internal/infrastructure/postgres"
+	"github.com/Irurnnen/go-gin-template/pkg/logger"
+	"github.com/go-playground/validator/v10"
 	"github.com/spf13/viper"
-	"go.uber.org/zap"
 )
 
-type Config struct {
-	ServerConfig   *ServerConfig   `mapstructure:"server"`
-	DatabaseConfig *DatabaseConfig `mapstructure:"database"`
-	LogLevel       string          `mapstructure:"log_level"`
-	Debug          bool            `mapstructure:"debug"`
-}
+const (
+	DefaultConfigPath = "/run/secrets"
+	DefaultConfigName = "shop-api"
+	ConfigType        = "yml"
+	EnvPrefix         = "shop_api"
+	EnvConfigPath     = "CONFIG_PATH"
+	EnvConfigName     = "CONFIG_NAME"
+)
 
-type DatabaseConfig struct {
-	Host     string `mapstructure:"host"`
-	Port     int    `mapstructure:"port"`
-	User     string `mapstructure:"user"`
-	Password string `mapstructure:"password"`
-	DBName   string `mapstructure:"db_name"`
-	Secure   bool   `mapstructure:"secure"`
-}
-
-func (d *DatabaseConfig) GetDSN() string {
-	DSN := fmt.Sprintf("postgresql://%s:%s@%s:%d/%s", d.User, d.Password, d.Host, d.Port, d.DBName)
-	if d.Secure {
-		return DSN
+type (
+	Config struct {
+		ServerConfig   *http.ServerConfig       `mapstructure:"server" validate:"required"`
+		PostgresConfig *postgres.PostgresConfig `mapstructure:"postgres" validate:"required"`
+		Logger         *logger.LoggerConfig     `mapstructure:"logger" validate:"required"`
 	}
-	return DSN + "?sslmode=disable"
-}
+)
 
-type ServerConfig struct {
-	Host string `mapstructure:"host"`
-	Port int    `mapstructure:"port"`
-}
+func Load() (*Config, error) {
+	// Initialize Viper
+	viperConfig := viper.New()
 
-func NewConfigExample() *Config {
-	return &Config{
-		ServerConfig: &ServerConfig{
-			Host: "0.0.0.0",
-			Port: 8080,
-		},
-		DatabaseConfig: &DatabaseConfig{
-			Host:     "hostname",
-			Port:     5432,
-			User:     "user",
-			Password: "password",
-			DBName:   "dbname",
-		},
-		LogLevel: "production",
-	}
-}
+	// Set env overriding
+	viperConfig.AutomaticEnv()
+	viperConfig.SetEnvPrefix(EnvPrefix)
+	viperConfig.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 
-func NewConfig() *Config {
-	viper.AddConfigPath("/run/secrets")
-	viper.SetConfigName("gin-template")
-	viper.SetConfigType("yaml")
+	// Set defaults for config initialization
+	viperConfig.SetDefault("config.name", DefaultConfigName)
+	viperConfig.SetDefault("config.path", DefaultConfigPath)
+	viperConfig.SetDefault("config.type", ConfigType)
 
-	if err := viper.ReadInConfig(); err != nil {
-		zap.L().Error("Failed to read config, using example config", zap.Error(err))
-		return NewConfigExample()
+	// Set config path
+	viperConfig.AddConfigPath(viperConfig.GetString("config.path"))
+	viperConfig.SetConfigType(viperConfig.GetString("config.type"))
+	viperConfig.SetConfigName(viperConfig.GetString("config.name"))
+
+	// Read raw config
+	if err := viperConfig.ReadInConfig(); err != nil {
+		return nil, err
 	}
 
-	var config Config
-	if err := viper.Unmarshal(&config); err != nil {
-		zap.L().Error("Failed to parse config, using example config", zap.Error(err))
-		return NewConfigExample()
+	// Unmarshal config
+	config := new(Config)
+	if err := viperConfig.Unmarshal(&config); err != nil {
+		return nil, err
 	}
 
-	return &config
-}
+	// Validate config
+	validate := validator.New()
+	if err := validate.Struct(config); err != nil {
+		return nil, err
+	}
 
-func NewConfigDebug() *Config {
-	Config := NewConfig()
-	Config.Debug = true // Set debug mode to true
-	return Config       // Return the modified config
+	return config, nil
 }
