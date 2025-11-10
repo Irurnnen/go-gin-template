@@ -9,7 +9,8 @@ import (
 
 	"github.com/Irurnnen/go-gin-template/internal/config"
 	"github.com/Irurnnen/go-gin-template/internal/delivery/http"
-	"github.com/Irurnnen/go-gin-template/internal/delivery/http/handler"
+	"github.com/Irurnnen/go-gin-template/internal/delivery/http/handlers"
+	"github.com/Irurnnen/go-gin-template/internal/delivery/http/middlewares"
 	"github.com/Irurnnen/go-gin-template/internal/infrastructure/postgres"
 	"github.com/Irurnnen/go-gin-template/internal/services/hello"
 	"github.com/Irurnnen/go-gin-template/pkg/logger"
@@ -54,13 +55,14 @@ func main() {
 	helloService := hello.NewHelloService(helloRepository, helloServiceLogger)
 
 	helloHandlerLogger := logger.New(cfg.Logger.GetLoggerConfig("hello_handler"))
-	helloHandler := handler.NewHelloHandler(helloService, helloHandlerLogger)
+	helloHandler := handlers.NewHelloHandler(helloService, helloHandlerLogger)
 
 	srvLogger := logger.New(cfg.Logger.GetLoggerConfig("http_server"))
 	srv := http.New(
 		cfg.ServerConfig,
 		srvLogger,
-		gin.Logger(),   // TODO: write custom logger
+		gin.LoggerWithConfig(middlewares.NewLoggerConfig(srvLogger)),
+		// gin.Logger(),   // TODO: write custom logger
 		gin.Recovery(), // TODO: write custom recovery
 	)
 	srv.RegisterRoutes(

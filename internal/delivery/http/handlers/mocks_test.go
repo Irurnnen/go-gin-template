@@ -2,7 +2,7 @@
 // github.com/vektra/mockery
 // template: testify
 
-package handler
+package handlers
 
 import (
 	"context"
