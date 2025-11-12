@@ -12,10 +12,12 @@ recursive: false
 require-template-schema-exists: true
 template-schema: "{{.Template}}.schema.json"
 packages:
-  github.com/Irurnnen/go-gin-template/internal/delivery/http/handler:
+  github.com/Irurnnen/go-gin-template/internal/delivery/http/handlers:
     interfaces:
       HelloHandlerInterface:
       HelloServiceInterface:
+      CatServiceInterface:
+      CatHandlerInterface:
   github.com/Irurnnen/go-gin-template/internal/services/hello:
     interfaces:
       HelloRepositoryInterface:
