@@ -4,7 +4,7 @@
 package http
 
 import (
-	_ "github.com/Irurnnen/go-gin-template/docs"
+	_ "github.com/Irurnnen/go-gin-template/docs" // Generated Swagger docs
 	"github.com/gin-gonic/gin"
 	ginSwaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"

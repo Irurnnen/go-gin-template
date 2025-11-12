@@ -1,7 +1,58 @@
 {
-    "components": {"schemas":{"models.HTTPError":{"properties":{"error":{"type":"string"},"message":{"type":"string"}},"type":"object"},"models.Message":{"properties":{"message":{"type":"string"}},"type":"object"}}},
-    "info": {"description":"This is a sample server caller server.","title":"go-gin-template","version":"0.0.1"},
-    "externalDocs": {"description":"","url":""},
-    "paths": {"/hello":{"get":{"description":"get hello world","responses":{"200":{"content":{"application/json":{"schema":{"$ref":"#/components/schemas/models.Message"}}},"description":"OK"},"500":{"content":{"application/json":{"schema":{"$ref":"#/components/schemas/models.HTTPError"}}},"description":"Internal Server Error"}},"summary":"Get Hello World message using database","tags":["Hello"]}}},
-    "openapi": "3.1.0"
+    "swagger": "2.0",
+    "info": {
+        "description": "This is a sample server caller server.",
+        "title": "go-gin-template",
+        "contact": {},
+        "version": "0.0.1"
+    },
+    "paths": {
+        "/hello": {
+            "get": {
+                "description": "get hello world",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Hello"
+                ],
+                "summary": "Get Hello World message using database",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Message"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.HTTPError"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "dto.HTTPError": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.Message": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                }
+            }
+        }
+    }
 }
