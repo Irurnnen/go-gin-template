@@ -50,13 +50,17 @@ type (
 	}
 
 	Cat struct {
-		ID        string
-		Name      string
-		Status    CatStatus
-		Breed     string
-		Age       int
-		CreatedAt int
-		UpdatedAt int
+		ID          string
+		Name        string
+		Status      CatStatus
+		Color       string
+		Gender      string
+		Weight      int
+		Description string
+		Breed       string
+		Age         int
+		CreatedAt   int
+		UpdatedAt   int
 	}
 
 	CatStatusStruct struct {
@@ -76,7 +80,8 @@ type (
 		Type      string
 		Color     string
 		Material  string
-		CreatesAt time.Time
+		CreatedAt time.Time
+		UpdatedAt time.Time
 	}
 
 	ToyID struct {
@@ -84,8 +89,12 @@ type (
 	}
 
 	Toy struct {
-		ID         string
-		Name       string
-		Created_at int
+		ID        string
+		Name      string
+		Type      string
+		Color     string
+		Material  string
+		CreatedAt int
+		UpdatedAt int
 	}
 )

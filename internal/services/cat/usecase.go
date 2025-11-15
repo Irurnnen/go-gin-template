@@ -15,7 +15,13 @@ type (
 	}
 )
 
-// func NewCatService
+func NewCatService(repo CatRepositoryInterface, logger *zerolog.Logger) *CatService {
+	return &CatService{
+		repo:   repo,
+		logger: logger,
+	}
+}
+
 func (cs *CatService) Create(ctx context.Context, data *CreateCat) (*CatID, error) {
 	id := uuid.NewString()
 
@@ -103,7 +109,8 @@ func (cs *CatService) AddToy(ctx context.Context, catID *CatID, data *CreateToy)
 		Type:      data.Type,
 		Color:     data.Color,
 		Material:  data.Material,
-		CreatesAt: time.Now(),
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
 	}
 
 	// Create Toy
