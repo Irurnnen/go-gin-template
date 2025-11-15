@@ -21,3 +21,6 @@ packages:
   github.com/Irurnnen/go-gin-template/internal/services/hello:
     interfaces:
       HelloRepositoryInterface:
+  github.com/Irurnnen/go-gin-template/internal/services/cat:
+    interfaces:
+      CatRepositoryInterface:
