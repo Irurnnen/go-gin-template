@@ -29,22 +29,23 @@ func TestCatService_Create_Success(t *testing.T) {
 	ctx := context.Background()
 
 	// input data
-	input := &CreateCat{
+	description := "friendly"
+	input := &CatCreate{
 		Name:           "Tom",
 		Breed:          "Tabby",
 		Color:          "gray",
 		Gender:         "male",
 		Weight:         4,
-		Description:    "friendly",
-		BirthTimestamp: time.Now(),
+		Description:    &description,
+		BirthTimestamp: time.Now().Unix(),
 	}
 
 	// Mock repository
 	mockRepo := NewMockCatRepositoryInterface(t)
 
-	var captured *CreateCatRepo
-	mockRepo.EXPECT().Create(ctx, mock.Anything).
-		Run(func(_ctx context.Context, data *CreateCatRepo) {
+	var captured *CatCreateRepo
+	mockRepo.EXPECT().CatCreate(ctx, mock.Anything).
+		Run(func(_ctx context.Context, data *CatCreateRepo) {
 			captured = data
 		}).Return(nil).Once()
 
@@ -52,7 +53,7 @@ func TestCatService_Create_Success(t *testing.T) {
 	service := NewCatService(mockRepo, &logger)
 
 	// Call method
-	id, err := service.Create(ctx, input)
+	id, err := service.CatCreate(ctx, input)
 
 	// Assertions
 	assert.NoError(t, err)
@@ -71,8 +72,8 @@ func TestCatService_Create_Success(t *testing.T) {
 		assert.Equal(t, input.Description, captured.Description)
 		assert.Equal(t, input.BirthTimestamp, captured.BirthTimestamp)
 		assert.Equal(t, CatStatusAvailable, captured.Status)
-		assert.False(t, captured.CreatedAt.IsZero())
-		assert.False(t, captured.UpdatedAt.IsZero())
+		assert.Positive(t, captured.CreatedAt)
+		assert.Positive(t, captured.UpdatedAt)
 	}
 
 	mockRepo.AssertExpectations(t)
@@ -82,20 +83,21 @@ func TestCatService_Create_RepoError(t *testing.T) {
 	ctx := context.Background()
 
 	// Input data
-	input := &CreateCat{
+	description := "asdasd"
+	input := &CatCreate{
 		Name:           "Jerry",
 		Breed:          "Siamese",
-		BirthTimestamp: time.Now(),
+		BirthTimestamp: time.Now().Unix(),
 		Color:          "green",
 		Gender:         "male",
 		Weight:         0,
-		Description:    "asdasd",
+		Description:    &description,
 	}
 
 	// Mock repository
 	mockRepo := NewMockCatRepositoryInterface(t)
 	mockRepo.EXPECT().
-		Create(ctx, mock.Anything).
+		CatCreate(ctx, mock.Anything).
 		Return(errors.New("db error")).Once()
 
 	// Service
@@ -103,7 +105,7 @@ func TestCatService_Create_RepoError(t *testing.T) {
 	service := NewCatService(mockRepo, &logger)
 
 	// Call method
-	id, err := service.Create(ctx, input)
+	id, err := service.CatCreate(ctx, input)
 
 	// Assertions
 	assert.Error(t, err)
@@ -135,14 +137,14 @@ func TestCatService_Search_Success(t *testing.T) {
 	// Mock repository
 	mockRepo := NewMockCatRepositoryInterface(t)
 
-	mockRepo.EXPECT().Search(ctx, params).
+	mockRepo.EXPECT().CatSearch(ctx, params).
 		Return(cats, nil).Once()
 
 	logger := zerolog.Nop()
 	service := NewCatService(mockRepo, &logger)
 
 	// Call method
-	cats, err := service.Search(ctx, params)
+	cats, err := service.CatSearch(ctx, params)
 
 	// Assertions
 	assert.NoError(t, err)
@@ -170,7 +172,7 @@ func TestCatService_Search_RepoErr(t *testing.T) {
 	mockRepo := NewMockCatRepositoryInterface(t)
 
 	mockRepo.EXPECT().
-		Search(ctx, params).
+		CatSearch(ctx, params).
 		Return(nil, errors.New("db error")).Once()
 
 	// Cat Service
@@ -178,7 +180,7 @@ func TestCatService_Search_RepoErr(t *testing.T) {
 	service := NewCatService(mockRepo, &logger)
 
 	// Call method
-	cats, err := service.Search(ctx, params)
+	cats, err := service.CatSearch(ctx, params)
 
 	// Assertions
 	assert.Error(t, err)
@@ -205,21 +207,21 @@ func TestCatService_GetByID_Success(t *testing.T) {
 		ID:          "00000000-0000-0000-0000-000000000000",
 		Status:      CatStatusAvailable,
 		Age:         12,
-		CreatedAt:   int(time.Now().Unix()) - 1000,
-		UpdatedAt:   int(time.Now().Unix()),
+		CreatedAt:   time.Now().Unix(),
+		UpdatedAt:   time.Now().Unix(),
 	}
 
 	// Mock repository
 	mockRepo := NewMockCatRepositoryInterface(t)
 
-	mockRepo.EXPECT().GetByID(ctx, id).
+	mockRepo.EXPECT().CatByID(ctx, id).
 		Return(exceptedCat, nil).Once()
 
 	logger := zerolog.Nop()
 	service := NewCatService(mockRepo, &logger)
 
 	// Call method
-	cat, err := service.GetByID(ctx, id)
+	cat, err := service.CatByID(ctx, id)
 
 	// Assertions
 	assert.NoError(t, err)
@@ -251,7 +253,7 @@ func TestCatService_GetByID_RepoErr(t *testing.T) {
 	// Mock repository
 	mockRepo := NewMockCatRepositoryInterface(t)
 	mockRepo.EXPECT().
-		GetByID(ctx, id).
+		CatByID(ctx, id).
 		Return(nil, errors.New("db error")).Once()
 
 	// Service
@@ -259,7 +261,7 @@ func TestCatService_GetByID_RepoErr(t *testing.T) {
 	service := NewCatService(mockRepo, &logger)
 
 	// Call method
-	cat, err := service.GetByID(ctx, id)
+	cat, err := service.CatByID(ctx, id)
 
 	// Assertions
 	assert.Error(t, err)
@@ -275,21 +277,23 @@ func TestCatService_ChangeStatus_Success(t *testing.T) {
 		ID: "00000000-0000-0000-0000-000000000000",
 	}
 
-	status := CatStatusSick
+	status := CatStatusStruct{
+		Status: CatStatusSick,
+	}
 
 	// Mock repository
 	mockRepo := NewMockCatRepositoryInterface(t)
 
 	mockRepo.EXPECT().CatExists(ctx, id).
 		Return(nil).Once()
-	mockRepo.EXPECT().ChangeStatus(ctx, id, &status).
+	mockRepo.EXPECT().CatChangeStatus(ctx, id, &status.Status).
 		Return(nil).Once()
 
 	logger := zerolog.Nop()
 	service := NewCatService(mockRepo, &logger)
 
 	// Call method
-	err := service.ChangeStatus(ctx, id, &status)
+	err := service.CatChangeStatus(ctx, id, &status)
 
 	// Assertions
 	assert.NoError(t, err)
@@ -305,7 +309,9 @@ func TestCatService_ChangeStatus_CatExists_RepoErr(t *testing.T) {
 		ID: "00000000-0000-0000-0000-000000000000",
 	}
 
-	status := CatStatusSick
+	status := CatStatusStruct{
+		Status: CatStatusSick,
+	}
 
 	// Mock repository
 	mockRepo := NewMockCatRepositoryInterface(t)
@@ -318,7 +324,7 @@ func TestCatService_ChangeStatus_CatExists_RepoErr(t *testing.T) {
 	service := NewCatService(mockRepo, &logger)
 
 	// Call method
-	err := service.ChangeStatus(ctx, id, &status)
+	err := service.CatChangeStatus(ctx, id, &status)
 
 	// Assertions
 	assert.Error(t, err)
@@ -333,7 +339,9 @@ func TestCatService_ChangeStatus_RepoErr(t *testing.T) {
 		ID: "00000000-0000-0000-0000-000000000000",
 	}
 
-	status := CatStatusSick
+	status := CatStatusStruct{
+		Status: CatStatusSick,
+	}
 
 	// Mock repository
 	mockRepo := NewMockCatRepositoryInterface(t)
@@ -341,7 +349,7 @@ func TestCatService_ChangeStatus_RepoErr(t *testing.T) {
 		CatExists(ctx, id).
 		Return(nil).Once()
 	mockRepo.EXPECT().
-		ChangeStatus(ctx, id, &status).
+		CatChangeStatus(ctx, id, &status.Status).
 		Return(errors.New("db error")).Once()
 
 	// Service
@@ -349,7 +357,7 @@ func TestCatService_ChangeStatus_RepoErr(t *testing.T) {
 	service := NewCatService(mockRepo, &logger)
 
 	// Call method
-	err := service.ChangeStatus(ctx, id, &status)
+	err := service.CatChangeStatus(ctx, id, &status)
 
 	// Assertions
 	assert.Error(t, err)
@@ -370,14 +378,14 @@ func TestCatService_Delete_Success(t *testing.T) {
 
 	mockRepo.EXPECT().CatExists(ctx, id).
 		Return(nil).Once()
-	mockRepo.EXPECT().Delete(ctx, id).
+	mockRepo.EXPECT().CatDelete(ctx, id).
 		Return(nil).Once()
 
 	logger := zerolog.Nop()
 	service := NewCatService(mockRepo, &logger)
 
 	// Call method
-	err := service.Delete(ctx, id)
+	err := service.CatDelete(ctx, id)
 
 	// Assertions
 	assert.NoError(t, err)
@@ -404,7 +412,7 @@ func TestCatService_Delete_CatExists_RepoErr(t *testing.T) {
 	service := NewCatService(mockRepo, &logger)
 
 	// Call method
-	err := service.Delete(ctx, id)
+	err := service.CatDelete(ctx, id)
 
 	// Assertions
 	assert.Error(t, err)
@@ -426,7 +434,7 @@ func TestCatService_Delete_RepoErr(t *testing.T) {
 		CatExists(ctx, id).
 		Return(nil).Once()
 	mockRepo.EXPECT().
-		Delete(ctx, id).
+		CatDelete(ctx, id).
 		Return(errors.New("db error")).Once()
 
 	// Service
@@ -434,7 +442,7 @@ func TestCatService_Delete_RepoErr(t *testing.T) {
 	service := NewCatService(mockRepo, &logger)
 
 	// Call method
-	err := service.Delete(ctx, id)
+	err := service.CatDelete(ctx, id)
 
 	// Assertions
 	assert.Error(t, err)
@@ -449,7 +457,7 @@ func TestCatService_AddToy_Success(t *testing.T) {
 	catID := &CatID{
 		ID: "00000000-0000-0000-0000-000000000000",
 	}
-	input := &CreateToy{
+	input := &ToyCreate{
 		Name:     "Gilbert",
 		Type:     "bear",
 		Color:    "white",
@@ -457,14 +465,14 @@ func TestCatService_AddToy_Success(t *testing.T) {
 	}
 
 	// Mock repository
-	var captured *CreateToyRepo
+	var captured *ToyCreateRepo
 	mockRepo := NewMockCatRepositoryInterface(t)
 	mockRepo.EXPECT().
 		CatExists(ctx, catID).
 		Return(nil).Once()
 	mockRepo.EXPECT().
-		AddToy(ctx, catID, mock.Anything).
-		Run(func(ctx context.Context, catID *CatID, data *CreateToyRepo) {
+		ToyCreate(ctx, catID, mock.Anything).
+		Run(func(ctx context.Context, catID *CatID, data *ToyCreateRepo) {
 			captured = data
 		}).
 		Return(nil).Once()
@@ -474,7 +482,7 @@ func TestCatService_AddToy_Success(t *testing.T) {
 	service := NewCatService(mockRepo, &logger)
 
 	// Call method
-	toyID, err := service.AddToy(ctx, catID, input)
+	toyID, err := service.ToyCreate(ctx, catID, input)
 
 	// Assertions
 	assert.NoError(t, err)
@@ -489,8 +497,8 @@ func TestCatService_AddToy_Success(t *testing.T) {
 		assert.Equal(t, input.Type, captured.Type)
 		assert.Equal(t, input.Color, captured.Color)
 		assert.Equal(t, input.Material, captured.Material)
-		assert.False(t, captured.CreatedAt.IsZero())
-		assert.False(t, captured.UpdatedAt.IsZero())
+		assert.Positive(t, captured.CreatedAt)
+		assert.Positive(t, captured.UpdatedAt)
 	}
 
 	mockRepo.AssertExpectations(t)
@@ -504,7 +512,7 @@ func TestCatService_AddToy_CatExists_RepoErr(t *testing.T) {
 		ID: "00000000-0000-0000-0000-000000000000",
 	}
 
-	input := &CreateToy{
+	input := &ToyCreate{
 		Name:     "Gilbert",
 		Type:     "bear",
 		Color:    "white",
@@ -522,7 +530,7 @@ func TestCatService_AddToy_CatExists_RepoErr(t *testing.T) {
 	service := NewCatService(mockRepo, &logger)
 
 	// Call method
-	_, err := service.AddToy(ctx, id, input)
+	_, err := service.ToyCreate(ctx, id, input)
 
 	// Assertions
 	assert.Error(t, err)
@@ -536,7 +544,7 @@ func TestCatService_AddToy_RepoErr(t *testing.T) {
 	catID := &CatID{
 		ID: "00000000-0000-0000-0000-000000000000",
 	}
-	input := &CreateToy{
+	input := &ToyCreate{
 		Name:     "Gilbert",
 		Type:     "bear",
 		Color:    "white",
@@ -549,7 +557,7 @@ func TestCatService_AddToy_RepoErr(t *testing.T) {
 		CatExists(ctx, catID).
 		Return(nil).Once()
 	mockRepo.EXPECT().
-		AddToy(ctx, catID, mock.Anything).
+		ToyCreate(ctx, catID, mock.Anything).
 		Return(errors.New("db error")).Once()
 
 	// Service
@@ -557,7 +565,7 @@ func TestCatService_AddToy_RepoErr(t *testing.T) {
 	service := NewCatService(mockRepo, &logger)
 
 	// Call method
-	toyID, err := service.AddToy(ctx, catID, input)
+	toyID, err := service.ToyCreate(ctx, catID, input)
 
 	// Assertions
 	assert.Error(t, err)
@@ -574,6 +582,14 @@ func TestCatService_GetToys_Success(t *testing.T) {
 		ID: "00000000-0000-0000-0000-000000000000",
 	}
 
+	// input data
+	name := "Tom"
+	color := "green"
+	params := &ToySearchParams{
+		Name:  &name,
+		Color: &color,
+	}
+
 	exceptedToys := []*Toy{
 		{Name: "Hello"},
 		{Name: "World"},
@@ -588,7 +604,7 @@ func TestCatService_GetToys_Success(t *testing.T) {
 		CatExists(ctx, catID).
 		Return(nil).Once()
 	mockRepo.EXPECT().
-		GetToys(ctx, catID).
+		ToySearch(ctx, catID, params).
 		Return(exceptedToys, nil).Once()
 
 	// Service
@@ -596,7 +612,7 @@ func TestCatService_GetToys_Success(t *testing.T) {
 	service := NewCatService(mockRepo, &logger)
 
 	// Call method
-	toys, err := service.GetToys(ctx, catID)
+	toys, err := service.ToySearch(ctx, catID, params)
 
 	// Assertions
 	assert.NoError(t, err)
@@ -618,6 +634,14 @@ func TestCatService_GetToys_CatExists_RepoErr(t *testing.T) {
 		ID: "00000000-0000-0000-0000-000000000000",
 	}
 
+	// input data
+	name := "Tom"
+	color := "green"
+	params := &ToySearchParams{
+		Name:  &name,
+		Color: &color,
+	}
+
 	// Mock repository
 	mockRepo := NewMockCatRepositoryInterface(t)
 	mockRepo.EXPECT().
@@ -629,7 +653,7 @@ func TestCatService_GetToys_CatExists_RepoErr(t *testing.T) {
 	service := NewCatService(mockRepo, &logger)
 
 	// Call method
-	_, err := service.GetToys(ctx, id)
+	_, err := service.ToySearch(ctx, id, params)
 
 	// Assertions
 	assert.Error(t, err)
@@ -645,13 +669,21 @@ func TestCatService_GetToys_RepoErr(t *testing.T) {
 		ID: "00000000-0000-0000-0000-000000000000",
 	}
 
+	// input data
+	name := "Tom"
+	color := "green"
+	params := &ToySearchParams{
+		Name:  &name,
+		Color: &color,
+	}
+
 	// Mock repository
 	mockRepo := NewMockCatRepositoryInterface(t)
 	mockRepo.EXPECT().
 		CatExists(ctx, catID).
 		Return(nil).Once()
 	mockRepo.EXPECT().
-		GetToys(ctx, catID).
+		ToySearch(ctx, catID, params).
 		Return(nil, errors.New("db error")).Once()
 
 	// Service
@@ -659,7 +691,7 @@ func TestCatService_GetToys_RepoErr(t *testing.T) {
 	service := NewCatService(mockRepo, &logger)
 
 	// Call method
-	toyID, err := service.GetToys(ctx, catID)
+	toyID, err := service.ToySearch(ctx, catID, params)
 
 	// Assertions
 	assert.Error(t, err)
@@ -686,8 +718,8 @@ func TestCatService_GetToyByID_Success(t *testing.T) {
 		Type:      "bear",
 		Color:     "green",
 		Material:  "synthetic",
-		CreatedAt: int(time.Now().Unix()),
-		UpdatedAt: int(time.Now().Unix()) - 36000,
+		CreatedAt: time.Now().Unix(),
+		UpdatedAt: time.Now().Unix(),
 	}
 
 	// Mock repository
@@ -702,7 +734,7 @@ func TestCatService_GetToyByID_Success(t *testing.T) {
 		ToyBelongs(ctx, catID, toyID).
 		Return(nil).Once()
 	mockRepo.EXPECT().
-		GetToyByID(ctx, toyID).
+		ToyByID(ctx, toyID).
 		Return(exceptedToy, nil).Once()
 
 	// Service
@@ -710,7 +742,7 @@ func TestCatService_GetToyByID_Success(t *testing.T) {
 	service := NewCatService(mockRepo, &logger)
 
 	// Call method
-	toy, err := service.GetToyByID(ctx, catID, toyID)
+	toy, err := service.ToyByID(ctx, catID, toyID)
 
 	// Assertions
 	assert.NoError(t, err)
@@ -751,7 +783,7 @@ func TestCatService_GetToyByID_CatExists_RepoErr(t *testing.T) {
 	service := NewCatService(mockRepo, &logger)
 
 	// Call method
-	toy, err := service.GetToyByID(ctx, catID, toyID)
+	toy, err := service.ToyByID(ctx, catID, toyID)
 
 	// Assertions
 	assert.Error(t, err)
@@ -785,7 +817,7 @@ func TestCatService_GetToyByID_ToyExists_RepoErr(t *testing.T) {
 	service := NewCatService(mockRepo, &logger)
 
 	// Call method
-	toy, err := service.GetToyByID(ctx, catID, toyID)
+	toy, err := service.ToyByID(ctx, catID, toyID)
 
 	// Assertions
 	assert.Error(t, err)
@@ -822,7 +854,7 @@ func TestCatService_GetToyByID_ToyBelongs_RepoErr(t *testing.T) {
 	service := NewCatService(mockRepo, &logger)
 
 	// Call method
-	toy, err := service.GetToyByID(ctx, catID, toyID)
+	toy, err := service.ToyByID(ctx, catID, toyID)
 
 	// Assertions
 	assert.Error(t, err)
@@ -854,7 +886,7 @@ func TestCatService_GetToyByID_RepoErr(t *testing.T) {
 		ToyBelongs(ctx, catID, toyID).
 		Return(nil).Once()
 	mockRepo.EXPECT().
-		GetToyByID(ctx, toyID).
+		ToyByID(ctx, toyID).
 		Return(nil, errors.New("db error")).Once()
 
 	// Service
@@ -862,7 +894,7 @@ func TestCatService_GetToyByID_RepoErr(t *testing.T) {
 	service := NewCatService(mockRepo, &logger)
 
 	// Call method
-	toy, err := service.GetToyByID(ctx, catID, toyID)
+	toy, err := service.ToyByID(ctx, catID, toyID)
 
 	// Assertions
 	assert.Error(t, err)
@@ -895,7 +927,7 @@ func TestCatService_DeleteToy_Success(t *testing.T) {
 		ToyBelongs(ctx, catID, toyID).
 		Return(nil).Once()
 	mockRepo.EXPECT().
-		DeleteToy(ctx, toyID).
+		ToyDelete(ctx, toyID).
 		Return(nil).Once()
 
 	// Service
@@ -903,7 +935,7 @@ func TestCatService_DeleteToy_Success(t *testing.T) {
 	service := NewCatService(mockRepo, &logger)
 
 	// Call method
-	err := service.DeleteToy(ctx, catID, toyID)
+	err := service.ToyDelete(ctx, catID, toyID)
 
 	// Assertions
 	assert.NoError(t, err)
@@ -934,7 +966,7 @@ func TestCatService_DeleteToy_CatExists_RepoErr(t *testing.T) {
 	service := NewCatService(mockRepo, &logger)
 
 	// Call method
-	err := service.DeleteToy(ctx, catID, toyID)
+	err := service.ToyDelete(ctx, catID, toyID)
 
 	// Assertions
 	assert.Error(t, err)
@@ -967,7 +999,7 @@ func TestCatService_DeleteToy_ToyExists_RepoErr(t *testing.T) {
 	service := NewCatService(mockRepo, &logger)
 
 	// Call method
-	err := service.DeleteToy(ctx, catID, toyID)
+	err := service.ToyDelete(ctx, catID, toyID)
 
 	// Assertions
 	assert.Error(t, err)
@@ -1004,7 +1036,7 @@ func TestCatService_DeleteToy_ToyBelongs_RepoErr(t *testing.T) {
 	service := NewCatService(mockRepo, &logger)
 
 	// Call method
-	err := service.DeleteToy(ctx, catID, toyID)
+	err := service.ToyDelete(ctx, catID, toyID)
 
 	// Assertions
 	assert.Error(t, err)
@@ -1036,7 +1068,7 @@ func TestCatService_DeleteToy_RepoErr(t *testing.T) {
 		ToyBelongs(ctx, catID, toyID).
 		Return(nil).Once()
 	mockRepo.EXPECT().
-		DeleteToy(ctx, toyID).
+		ToyDelete(ctx, toyID).
 		Return(errors.New("db error")).Once()
 
 	// Service
@@ -1044,7 +1076,7 @@ func TestCatService_DeleteToy_RepoErr(t *testing.T) {
 	service := NewCatService(mockRepo, &logger)
 
 	// Call method
-	err := service.DeleteToy(ctx, catID, toyID)
+	err := service.ToyDelete(ctx, catID, toyID)
 
 	// Assertions
 	assert.Error(t, err)

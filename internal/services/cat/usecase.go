@@ -22,24 +22,24 @@ func NewCatService(repo CatRepositoryInterface, logger *zerolog.Logger) *CatServ
 	}
 }
 
-func (cs *CatService) Create(ctx context.Context, data *CreateCat) (*CatID, error) {
+func (cs *CatService) CatCreate(ctx context.Context, data *CatCreate) (*CatID, error) {
 	id := uuid.NewString()
 
-	repoData := &CreateCatRepo{
+	repoData := &CatCreateRepo{
 		ID:             id,
 		Name:           data.Name,
 		Status:         CatStatusAvailable,
 		Breed:          data.Breed,
-		CreatedAt:      time.Now(),
-		UpdatedAt:      time.Now(),
-		BirthTimestamp: time.Time{},
+		CreatedAt:      time.Now().Unix(),
+		UpdatedAt:      time.Now().Unix(),
+		BirthTimestamp: data.BirthTimestamp,
 		Color:          data.Color,
 		Gender:         data.Gender,
 		Weight:         data.Weight,
 		Description:    data.Description,
 	}
 
-	err := cs.repo.Create(ctx, repoData)
+	err := cs.repo.CatCreate(ctx, repoData)
 	if err != nil {
 		return nil, err
 	}
@@ -47,8 +47,8 @@ func (cs *CatService) Create(ctx context.Context, data *CreateCat) (*CatID, erro
 	return &CatID{ID: id}, nil
 }
 
-func (cs *CatService) Search(ctx context.Context, params *CatSearchParams) ([]*Cat, error) {
-	cats, err := cs.repo.Search(ctx, params)
+func (cs *CatService) CatSearch(ctx context.Context, params *CatSearchParams) ([]*Cat, error) {
+	cats, err := cs.repo.CatSearch(ctx, params)
 	if err != nil {
 		return nil, err
 	}
@@ -56,22 +56,22 @@ func (cs *CatService) Search(ctx context.Context, params *CatSearchParams) ([]*C
 	return cats, nil
 }
 
-func (cs *CatService) GetByID(ctx context.Context, id *CatID) (*Cat, error) {
-	cat, err := cs.repo.GetByID(ctx, id)
+func (cs *CatService) CatByID(ctx context.Context, id *CatID) (*Cat, error) {
+	cat, err := cs.repo.CatByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
 	return cat, nil
 }
 
-func (cs *CatService) ChangeStatus(ctx context.Context, id *CatID, status *CatStatus) error {
+func (cs *CatService) CatChangeStatus(ctx context.Context, id *CatID, status *CatStatusStruct) error {
 	// Check exists cat
 	if err := cs.repo.CatExists(ctx, id); err != nil {
 		return err
 	}
 
 	// Change status
-	err := cs.repo.ChangeStatus(ctx, id, status)
+	err := cs.repo.CatChangeStatus(ctx, id, &status.Status)
 	if err != nil {
 		return err
 	}
@@ -79,21 +79,21 @@ func (cs *CatService) ChangeStatus(ctx context.Context, id *CatID, status *CatSt
 	return nil
 }
 
-func (cs *CatService) Delete(ctx context.Context, id *CatID) error {
+func (cs *CatService) CatDelete(ctx context.Context, id *CatID) error {
 	// Check exists cat
 	if err := cs.repo.CatExists(ctx, id); err != nil {
 		return err
 	}
 
 	// Change status
-	err := cs.repo.Delete(ctx, id)
+	err := cs.repo.CatDelete(ctx, id)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (cs *CatService) AddToy(ctx context.Context, catID *CatID, data *CreateToy) (*ToyID, error) {
+func (cs *CatService) ToyCreate(ctx context.Context, catID *CatID, data *ToyCreate) (*ToyID, error) {
 	// Check exists cat
 	if err := cs.repo.CatExists(ctx, catID); err != nil {
 		return nil, err
@@ -103,18 +103,18 @@ func (cs *CatService) AddToy(ctx context.Context, catID *CatID, data *CreateToy)
 	id := uuid.NewString()
 
 	// Create structure for create ToyID
-	repoData := &CreateToyRepo{
+	repoData := &ToyCreateRepo{
 		ID:        id,
 		Name:      data.Name,
 		Type:      data.Type,
 		Color:     data.Color,
 		Material:  data.Material,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		CreatedAt: time.Now().Unix(),
+		UpdatedAt: time.Now().Unix(),
 	}
 
 	// Create Toy
-	err := cs.repo.AddToy(ctx, catID, repoData)
+	err := cs.repo.ToyCreate(ctx, catID, repoData)
 	if err != nil {
 		return nil, err
 	}
@@ -122,21 +122,21 @@ func (cs *CatService) AddToy(ctx context.Context, catID *CatID, data *CreateToy)
 	return &ToyID{ID: id}, nil
 }
 
-func (cs *CatService) GetToys(ctx context.Context, catID *CatID) ([]*Toy, error) {
+func (cs *CatService) ToySearch(ctx context.Context, catID *CatID, params *ToySearchParams) ([]*Toy, error) {
 	// Check exists cat
 	if err := cs.repo.CatExists(ctx, catID); err != nil {
 		return nil, err
 	}
 
 	// Get toys by cat's id
-	toys, err := cs.repo.GetToys(ctx, catID)
+	toys, err := cs.repo.ToySearch(ctx, catID, params)
 	if err != nil {
 		return nil, err
 	}
 	return toys, nil
 }
 
-func (cs *CatService) GetToyByID(ctx context.Context, catID *CatID, toyID *ToyID) (*Toy, error) {
+func (cs *CatService) ToyByID(ctx context.Context, catID *CatID, toyID *ToyID) (*Toy, error) {
 	// Check cat exists
 	if err := cs.repo.CatExists(ctx, catID); err != nil {
 		return nil, err
@@ -153,7 +153,7 @@ func (cs *CatService) GetToyByID(ctx context.Context, catID *CatID, toyID *ToyID
 	}
 
 	// Get toy by toy id
-	toy, err := cs.repo.GetToyByID(ctx, toyID)
+	toy, err := cs.repo.ToyByID(ctx, toyID)
 	if err != nil {
 		return nil, err
 	}
@@ -161,7 +161,7 @@ func (cs *CatService) GetToyByID(ctx context.Context, catID *CatID, toyID *ToyID
 	return toy, nil
 }
 
-func (cs *CatService) DeleteToy(ctx context.Context, catID *CatID, toyID *ToyID) error {
+func (cs *CatService) ToyDelete(ctx context.Context, catID *CatID, toyID *ToyID) error {
 	// Check exists cat
 	if err := cs.repo.CatExists(ctx, catID); err != nil {
 		return err
@@ -178,7 +178,7 @@ func (cs *CatService) DeleteToy(ctx context.Context, catID *CatID, toyID *ToyID)
 	}
 
 	// Delete cat
-	err := cs.repo.DeleteToy(ctx, toyID)
+	err := cs.repo.ToyDelete(ctx, toyID)
 	if err != nil {
 		return err
 	}

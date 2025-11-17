@@ -1,7 +1,5 @@
 package cat
 
-import "time"
-
 const (
 	CatStatusAvailable CatStatus = "available"
 	CatStatusAdopted   CatStatus = "adopted"
@@ -13,28 +11,28 @@ const (
 type (
 	CatStatus string
 
-	CreateCat struct {
+	CatCreate struct {
 		Name           string
 		Breed          string
-		BirthTimestamp time.Time
+		BirthTimestamp int64
 		Color          string
 		Gender         string
 		Weight         int
-		Description    string
+		Description    *string
 	}
 
-	CreateCatRepo struct {
+	CatCreateRepo struct {
 		ID             string
 		Name           string
 		Breed          string
 		Status         CatStatus
-		BirthTimestamp time.Time
+		BirthTimestamp int64
 		Color          string
 		Gender         string
 		Weight         int
-		Description    string
-		CreatedAt      time.Time
-		UpdatedAt      time.Time
+		Description    *string
+		CreatedAt      int64
+		UpdatedAt      int64
 	}
 
 	CatID struct {
@@ -45,7 +43,7 @@ type (
 		Name   *string
 		Breed  *string
 		Age    *int
-		Limit  *int
+		Limit  int
 		Offset *int
 	}
 
@@ -59,29 +57,29 @@ type (
 		Description string
 		Breed       string
 		Age         int
-		CreatedAt   int
-		UpdatedAt   int
+		CreatedAt   int64
+		UpdatedAt   int64
 	}
 
 	CatStatusStruct struct {
 		Status CatStatus
 	}
 
-	CreateToy struct {
+	ToyCreate struct {
 		Name     string
 		Type     string
 		Color    string
 		Material string
 	}
 
-	CreateToyRepo struct {
+	ToyCreateRepo struct {
 		ID        string
 		Name      string
 		Type      string
 		Color     string
 		Material  string
-		CreatedAt time.Time
-		UpdatedAt time.Time
+		CreatedAt int64
+		UpdatedAt int64
 	}
 
 	ToyID struct {
@@ -94,7 +92,16 @@ type (
 		Type      string
 		Color     string
 		Material  string
-		CreatedAt int
-		UpdatedAt int
+		CreatedAt int64
+		UpdatedAt int64
+	}
+
+	ToySearchParams struct {
+		Name     *string
+		Type     *string
+		Color    *string
+		Material *string
+		Limit    int
+		Offset   *int
 	}
 )

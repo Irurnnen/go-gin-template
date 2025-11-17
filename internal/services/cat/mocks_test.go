@@ -37,37 +37,47 @@ func (_m *MockCatRepositoryInterface) EXPECT() *MockCatRepositoryInterface_Expec
 	return &MockCatRepositoryInterface_Expecter{mock: &_m.Mock}
 }
 
-// AddToy provides a mock function for the type MockCatRepositoryInterface
-func (_mock *MockCatRepositoryInterface) AddToy(ctx context.Context, catID *CatID, data *CreateToyRepo) error {
-	ret := _mock.Called(ctx, catID, data)
+// CatByID provides a mock function for the type MockCatRepositoryInterface
+func (_mock *MockCatRepositoryInterface) CatByID(ctx context.Context, id *CatID) (*Cat, error) {
+	ret := _mock.Called(ctx, id)
 
 	if len(ret) == 0 {
-		panic("no return value specified for AddToy")
+		panic("no return value specified for CatByID")
 	}
 
-	var r0 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *CatID, *CreateToyRepo) error); ok {
-		r0 = returnFunc(ctx, catID, data)
-	} else {
-		r0 = ret.Error(0)
+	var r0 *Cat
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *CatID) (*Cat, error)); ok {
+		return returnFunc(ctx, id)
 	}
-	return r0
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *CatID) *Cat); ok {
+		r0 = returnFunc(ctx, id)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*Cat)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *CatID) error); ok {
+		r1 = returnFunc(ctx, id)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
 }
 
-// MockCatRepositoryInterface_AddToy_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'AddToy'
-type MockCatRepositoryInterface_AddToy_Call struct {
+// MockCatRepositoryInterface_CatByID_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CatByID'
+type MockCatRepositoryInterface_CatByID_Call struct {
 	*mock.Call
 }
 
-// AddToy is a helper method to define mock.On call
+// CatByID is a helper method to define mock.On call
 //   - ctx context.Context
-//   - catID *CatID
-//   - data *CreateToyRepo
-func (_e *MockCatRepositoryInterface_Expecter) AddToy(ctx interface{}, catID interface{}, data interface{}) *MockCatRepositoryInterface_AddToy_Call {
-	return &MockCatRepositoryInterface_AddToy_Call{Call: _e.mock.On("AddToy", ctx, catID, data)}
+//   - id *CatID
+func (_e *MockCatRepositoryInterface_Expecter) CatByID(ctx interface{}, id interface{}) *MockCatRepositoryInterface_CatByID_Call {
+	return &MockCatRepositoryInterface_CatByID_Call{Call: _e.mock.On("CatByID", ctx, id)}
 }
 
-func (_c *MockCatRepositoryInterface_AddToy_Call) Run(run func(ctx context.Context, catID *CatID, data *CreateToyRepo)) *MockCatRepositoryInterface_AddToy_Call {
+func (_c *MockCatRepositoryInterface_CatByID_Call) Run(run func(ctx context.Context, id *CatID)) *MockCatRepositoryInterface_CatByID_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
@@ -77,9 +87,67 @@ func (_c *MockCatRepositoryInterface_AddToy_Call) Run(run func(ctx context.Conte
 		if args[1] != nil {
 			arg1 = args[1].(*CatID)
 		}
-		var arg2 *CreateToyRepo
+		run(
+			arg0,
+			arg1,
+		)
+	})
+	return _c
+}
+
+func (_c *MockCatRepositoryInterface_CatByID_Call) Return(cat *Cat, err error) *MockCatRepositoryInterface_CatByID_Call {
+	_c.Call.Return(cat, err)
+	return _c
+}
+
+func (_c *MockCatRepositoryInterface_CatByID_Call) RunAndReturn(run func(ctx context.Context, id *CatID) (*Cat, error)) *MockCatRepositoryInterface_CatByID_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// CatChangeStatus provides a mock function for the type MockCatRepositoryInterface
+func (_mock *MockCatRepositoryInterface) CatChangeStatus(ctx context.Context, id *CatID, status *CatStatus) error {
+	ret := _mock.Called(ctx, id, status)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CatChangeStatus")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *CatID, *CatStatus) error); ok {
+		r0 = returnFunc(ctx, id, status)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// MockCatRepositoryInterface_CatChangeStatus_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CatChangeStatus'
+type MockCatRepositoryInterface_CatChangeStatus_Call struct {
+	*mock.Call
+}
+
+// CatChangeStatus is a helper method to define mock.On call
+//   - ctx context.Context
+//   - id *CatID
+//   - status *CatStatus
+func (_e *MockCatRepositoryInterface_Expecter) CatChangeStatus(ctx interface{}, id interface{}, status interface{}) *MockCatRepositoryInterface_CatChangeStatus_Call {
+	return &MockCatRepositoryInterface_CatChangeStatus_Call{Call: _e.mock.On("CatChangeStatus", ctx, id, status)}
+}
+
+func (_c *MockCatRepositoryInterface_CatChangeStatus_Call) Run(run func(ctx context.Context, id *CatID, status *CatStatus)) *MockCatRepositoryInterface_CatChangeStatus_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 *CatID
+		if args[1] != nil {
+			arg1 = args[1].(*CatID)
+		}
+		var arg2 *CatStatus
 		if args[2] != nil {
-			arg2 = args[2].(*CreateToyRepo)
+			arg2 = args[2].(*CatStatus)
 		}
 		run(
 			arg0,
@@ -90,12 +158,126 @@ func (_c *MockCatRepositoryInterface_AddToy_Call) Run(run func(ctx context.Conte
 	return _c
 }
 
-func (_c *MockCatRepositoryInterface_AddToy_Call) Return(err error) *MockCatRepositoryInterface_AddToy_Call {
+func (_c *MockCatRepositoryInterface_CatChangeStatus_Call) Return(err error) *MockCatRepositoryInterface_CatChangeStatus_Call {
 	_c.Call.Return(err)
 	return _c
 }
 
-func (_c *MockCatRepositoryInterface_AddToy_Call) RunAndReturn(run func(ctx context.Context, catID *CatID, data *CreateToyRepo) error) *MockCatRepositoryInterface_AddToy_Call {
+func (_c *MockCatRepositoryInterface_CatChangeStatus_Call) RunAndReturn(run func(ctx context.Context, id *CatID, status *CatStatus) error) *MockCatRepositoryInterface_CatChangeStatus_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// CatCreate provides a mock function for the type MockCatRepositoryInterface
+func (_mock *MockCatRepositoryInterface) CatCreate(ctx context.Context, data *CatCreateRepo) error {
+	ret := _mock.Called(ctx, data)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CatCreate")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *CatCreateRepo) error); ok {
+		r0 = returnFunc(ctx, data)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// MockCatRepositoryInterface_CatCreate_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CatCreate'
+type MockCatRepositoryInterface_CatCreate_Call struct {
+	*mock.Call
+}
+
+// CatCreate is a helper method to define mock.On call
+//   - ctx context.Context
+//   - data *CatCreateRepo
+func (_e *MockCatRepositoryInterface_Expecter) CatCreate(ctx interface{}, data interface{}) *MockCatRepositoryInterface_CatCreate_Call {
+	return &MockCatRepositoryInterface_CatCreate_Call{Call: _e.mock.On("CatCreate", ctx, data)}
+}
+
+func (_c *MockCatRepositoryInterface_CatCreate_Call) Run(run func(ctx context.Context, data *CatCreateRepo)) *MockCatRepositoryInterface_CatCreate_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 *CatCreateRepo
+		if args[1] != nil {
+			arg1 = args[1].(*CatCreateRepo)
+		}
+		run(
+			arg0,
+			arg1,
+		)
+	})
+	return _c
+}
+
+func (_c *MockCatRepositoryInterface_CatCreate_Call) Return(err error) *MockCatRepositoryInterface_CatCreate_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *MockCatRepositoryInterface_CatCreate_Call) RunAndReturn(run func(ctx context.Context, data *CatCreateRepo) error) *MockCatRepositoryInterface_CatCreate_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// CatDelete provides a mock function for the type MockCatRepositoryInterface
+func (_mock *MockCatRepositoryInterface) CatDelete(ctx context.Context, id *CatID) error {
+	ret := _mock.Called(ctx, id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CatDelete")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *CatID) error); ok {
+		r0 = returnFunc(ctx, id)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// MockCatRepositoryInterface_CatDelete_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CatDelete'
+type MockCatRepositoryInterface_CatDelete_Call struct {
+	*mock.Call
+}
+
+// CatDelete is a helper method to define mock.On call
+//   - ctx context.Context
+//   - id *CatID
+func (_e *MockCatRepositoryInterface_Expecter) CatDelete(ctx interface{}, id interface{}) *MockCatRepositoryInterface_CatDelete_Call {
+	return &MockCatRepositoryInterface_CatDelete_Call{Call: _e.mock.On("CatDelete", ctx, id)}
+}
+
+func (_c *MockCatRepositoryInterface_CatDelete_Call) Run(run func(ctx context.Context, id *CatID)) *MockCatRepositoryInterface_CatDelete_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 *CatID
+		if args[1] != nil {
+			arg1 = args[1].(*CatID)
+		}
+		run(
+			arg0,
+			arg1,
+		)
+	})
+	return _c
+}
+
+func (_c *MockCatRepositoryInterface_CatDelete_Call) Return(err error) *MockCatRepositoryInterface_CatDelete_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *MockCatRepositoryInterface_CatDelete_Call) RunAndReturn(run func(ctx context.Context, id *CatID) error) *MockCatRepositoryInterface_CatDelete_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -157,450 +339,12 @@ func (_c *MockCatRepositoryInterface_CatExists_Call) RunAndReturn(run func(ctx c
 	return _c
 }
 
-// ChangeStatus provides a mock function for the type MockCatRepositoryInterface
-func (_mock *MockCatRepositoryInterface) ChangeStatus(ctx context.Context, id *CatID, status *CatStatus) error {
-	ret := _mock.Called(ctx, id, status)
-
-	if len(ret) == 0 {
-		panic("no return value specified for ChangeStatus")
-	}
-
-	var r0 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *CatID, *CatStatus) error); ok {
-		r0 = returnFunc(ctx, id, status)
-	} else {
-		r0 = ret.Error(0)
-	}
-	return r0
-}
-
-// MockCatRepositoryInterface_ChangeStatus_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ChangeStatus'
-type MockCatRepositoryInterface_ChangeStatus_Call struct {
-	*mock.Call
-}
-
-// ChangeStatus is a helper method to define mock.On call
-//   - ctx context.Context
-//   - id *CatID
-//   - status *CatStatus
-func (_e *MockCatRepositoryInterface_Expecter) ChangeStatus(ctx interface{}, id interface{}, status interface{}) *MockCatRepositoryInterface_ChangeStatus_Call {
-	return &MockCatRepositoryInterface_ChangeStatus_Call{Call: _e.mock.On("ChangeStatus", ctx, id, status)}
-}
-
-func (_c *MockCatRepositoryInterface_ChangeStatus_Call) Run(run func(ctx context.Context, id *CatID, status *CatStatus)) *MockCatRepositoryInterface_ChangeStatus_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		var arg0 context.Context
-		if args[0] != nil {
-			arg0 = args[0].(context.Context)
-		}
-		var arg1 *CatID
-		if args[1] != nil {
-			arg1 = args[1].(*CatID)
-		}
-		var arg2 *CatStatus
-		if args[2] != nil {
-			arg2 = args[2].(*CatStatus)
-		}
-		run(
-			arg0,
-			arg1,
-			arg2,
-		)
-	})
-	return _c
-}
-
-func (_c *MockCatRepositoryInterface_ChangeStatus_Call) Return(err error) *MockCatRepositoryInterface_ChangeStatus_Call {
-	_c.Call.Return(err)
-	return _c
-}
-
-func (_c *MockCatRepositoryInterface_ChangeStatus_Call) RunAndReturn(run func(ctx context.Context, id *CatID, status *CatStatus) error) *MockCatRepositoryInterface_ChangeStatus_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// Create provides a mock function for the type MockCatRepositoryInterface
-func (_mock *MockCatRepositoryInterface) Create(ctx context.Context, data *CreateCatRepo) error {
-	ret := _mock.Called(ctx, data)
-
-	if len(ret) == 0 {
-		panic("no return value specified for Create")
-	}
-
-	var r0 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *CreateCatRepo) error); ok {
-		r0 = returnFunc(ctx, data)
-	} else {
-		r0 = ret.Error(0)
-	}
-	return r0
-}
-
-// MockCatRepositoryInterface_Create_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Create'
-type MockCatRepositoryInterface_Create_Call struct {
-	*mock.Call
-}
-
-// Create is a helper method to define mock.On call
-//   - ctx context.Context
-//   - data *CreateCatRepo
-func (_e *MockCatRepositoryInterface_Expecter) Create(ctx interface{}, data interface{}) *MockCatRepositoryInterface_Create_Call {
-	return &MockCatRepositoryInterface_Create_Call{Call: _e.mock.On("Create", ctx, data)}
-}
-
-func (_c *MockCatRepositoryInterface_Create_Call) Run(run func(ctx context.Context, data *CreateCatRepo)) *MockCatRepositoryInterface_Create_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		var arg0 context.Context
-		if args[0] != nil {
-			arg0 = args[0].(context.Context)
-		}
-		var arg1 *CreateCatRepo
-		if args[1] != nil {
-			arg1 = args[1].(*CreateCatRepo)
-		}
-		run(
-			arg0,
-			arg1,
-		)
-	})
-	return _c
-}
-
-func (_c *MockCatRepositoryInterface_Create_Call) Return(err error) *MockCatRepositoryInterface_Create_Call {
-	_c.Call.Return(err)
-	return _c
-}
-
-func (_c *MockCatRepositoryInterface_Create_Call) RunAndReturn(run func(ctx context.Context, data *CreateCatRepo) error) *MockCatRepositoryInterface_Create_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// Delete provides a mock function for the type MockCatRepositoryInterface
-func (_mock *MockCatRepositoryInterface) Delete(ctx context.Context, id *CatID) error {
-	ret := _mock.Called(ctx, id)
-
-	if len(ret) == 0 {
-		panic("no return value specified for Delete")
-	}
-
-	var r0 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *CatID) error); ok {
-		r0 = returnFunc(ctx, id)
-	} else {
-		r0 = ret.Error(0)
-	}
-	return r0
-}
-
-// MockCatRepositoryInterface_Delete_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Delete'
-type MockCatRepositoryInterface_Delete_Call struct {
-	*mock.Call
-}
-
-// Delete is a helper method to define mock.On call
-//   - ctx context.Context
-//   - id *CatID
-func (_e *MockCatRepositoryInterface_Expecter) Delete(ctx interface{}, id interface{}) *MockCatRepositoryInterface_Delete_Call {
-	return &MockCatRepositoryInterface_Delete_Call{Call: _e.mock.On("Delete", ctx, id)}
-}
-
-func (_c *MockCatRepositoryInterface_Delete_Call) Run(run func(ctx context.Context, id *CatID)) *MockCatRepositoryInterface_Delete_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		var arg0 context.Context
-		if args[0] != nil {
-			arg0 = args[0].(context.Context)
-		}
-		var arg1 *CatID
-		if args[1] != nil {
-			arg1 = args[1].(*CatID)
-		}
-		run(
-			arg0,
-			arg1,
-		)
-	})
-	return _c
-}
-
-func (_c *MockCatRepositoryInterface_Delete_Call) Return(err error) *MockCatRepositoryInterface_Delete_Call {
-	_c.Call.Return(err)
-	return _c
-}
-
-func (_c *MockCatRepositoryInterface_Delete_Call) RunAndReturn(run func(ctx context.Context, id *CatID) error) *MockCatRepositoryInterface_Delete_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// DeleteToy provides a mock function for the type MockCatRepositoryInterface
-func (_mock *MockCatRepositoryInterface) DeleteToy(ctx context.Context, toyID *ToyID) error {
-	ret := _mock.Called(ctx, toyID)
-
-	if len(ret) == 0 {
-		panic("no return value specified for DeleteToy")
-	}
-
-	var r0 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *ToyID) error); ok {
-		r0 = returnFunc(ctx, toyID)
-	} else {
-		r0 = ret.Error(0)
-	}
-	return r0
-}
-
-// MockCatRepositoryInterface_DeleteToy_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DeleteToy'
-type MockCatRepositoryInterface_DeleteToy_Call struct {
-	*mock.Call
-}
-
-// DeleteToy is a helper method to define mock.On call
-//   - ctx context.Context
-//   - toyID *ToyID
-func (_e *MockCatRepositoryInterface_Expecter) DeleteToy(ctx interface{}, toyID interface{}) *MockCatRepositoryInterface_DeleteToy_Call {
-	return &MockCatRepositoryInterface_DeleteToy_Call{Call: _e.mock.On("DeleteToy", ctx, toyID)}
-}
-
-func (_c *MockCatRepositoryInterface_DeleteToy_Call) Run(run func(ctx context.Context, toyID *ToyID)) *MockCatRepositoryInterface_DeleteToy_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		var arg0 context.Context
-		if args[0] != nil {
-			arg0 = args[0].(context.Context)
-		}
-		var arg1 *ToyID
-		if args[1] != nil {
-			arg1 = args[1].(*ToyID)
-		}
-		run(
-			arg0,
-			arg1,
-		)
-	})
-	return _c
-}
-
-func (_c *MockCatRepositoryInterface_DeleteToy_Call) Return(err error) *MockCatRepositoryInterface_DeleteToy_Call {
-	_c.Call.Return(err)
-	return _c
-}
-
-func (_c *MockCatRepositoryInterface_DeleteToy_Call) RunAndReturn(run func(ctx context.Context, toyID *ToyID) error) *MockCatRepositoryInterface_DeleteToy_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// GetByID provides a mock function for the type MockCatRepositoryInterface
-func (_mock *MockCatRepositoryInterface) GetByID(ctx context.Context, id *CatID) (*Cat, error) {
-	ret := _mock.Called(ctx, id)
-
-	if len(ret) == 0 {
-		panic("no return value specified for GetByID")
-	}
-
-	var r0 *Cat
-	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *CatID) (*Cat, error)); ok {
-		return returnFunc(ctx, id)
-	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *CatID) *Cat); ok {
-		r0 = returnFunc(ctx, id)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*Cat)
-		}
-	}
-	if returnFunc, ok := ret.Get(1).(func(context.Context, *CatID) error); ok {
-		r1 = returnFunc(ctx, id)
-	} else {
-		r1 = ret.Error(1)
-	}
-	return r0, r1
-}
-
-// MockCatRepositoryInterface_GetByID_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetByID'
-type MockCatRepositoryInterface_GetByID_Call struct {
-	*mock.Call
-}
-
-// GetByID is a helper method to define mock.On call
-//   - ctx context.Context
-//   - id *CatID
-func (_e *MockCatRepositoryInterface_Expecter) GetByID(ctx interface{}, id interface{}) *MockCatRepositoryInterface_GetByID_Call {
-	return &MockCatRepositoryInterface_GetByID_Call{Call: _e.mock.On("GetByID", ctx, id)}
-}
-
-func (_c *MockCatRepositoryInterface_GetByID_Call) Run(run func(ctx context.Context, id *CatID)) *MockCatRepositoryInterface_GetByID_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		var arg0 context.Context
-		if args[0] != nil {
-			arg0 = args[0].(context.Context)
-		}
-		var arg1 *CatID
-		if args[1] != nil {
-			arg1 = args[1].(*CatID)
-		}
-		run(
-			arg0,
-			arg1,
-		)
-	})
-	return _c
-}
-
-func (_c *MockCatRepositoryInterface_GetByID_Call) Return(cat *Cat, err error) *MockCatRepositoryInterface_GetByID_Call {
-	_c.Call.Return(cat, err)
-	return _c
-}
-
-func (_c *MockCatRepositoryInterface_GetByID_Call) RunAndReturn(run func(ctx context.Context, id *CatID) (*Cat, error)) *MockCatRepositoryInterface_GetByID_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// GetToyByID provides a mock function for the type MockCatRepositoryInterface
-func (_mock *MockCatRepositoryInterface) GetToyByID(ctx context.Context, toyID *ToyID) (*Toy, error) {
-	ret := _mock.Called(ctx, toyID)
-
-	if len(ret) == 0 {
-		panic("no return value specified for GetToyByID")
-	}
-
-	var r0 *Toy
-	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *ToyID) (*Toy, error)); ok {
-		return returnFunc(ctx, toyID)
-	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *ToyID) *Toy); ok {
-		r0 = returnFunc(ctx, toyID)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*Toy)
-		}
-	}
-	if returnFunc, ok := ret.Get(1).(func(context.Context, *ToyID) error); ok {
-		r1 = returnFunc(ctx, toyID)
-	} else {
-		r1 = ret.Error(1)
-	}
-	return r0, r1
-}
-
-// MockCatRepositoryInterface_GetToyByID_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetToyByID'
-type MockCatRepositoryInterface_GetToyByID_Call struct {
-	*mock.Call
-}
-
-// GetToyByID is a helper method to define mock.On call
-//   - ctx context.Context
-//   - toyID *ToyID
-func (_e *MockCatRepositoryInterface_Expecter) GetToyByID(ctx interface{}, toyID interface{}) *MockCatRepositoryInterface_GetToyByID_Call {
-	return &MockCatRepositoryInterface_GetToyByID_Call{Call: _e.mock.On("GetToyByID", ctx, toyID)}
-}
-
-func (_c *MockCatRepositoryInterface_GetToyByID_Call) Run(run func(ctx context.Context, toyID *ToyID)) *MockCatRepositoryInterface_GetToyByID_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		var arg0 context.Context
-		if args[0] != nil {
-			arg0 = args[0].(context.Context)
-		}
-		var arg1 *ToyID
-		if args[1] != nil {
-			arg1 = args[1].(*ToyID)
-		}
-		run(
-			arg0,
-			arg1,
-		)
-	})
-	return _c
-}
-
-func (_c *MockCatRepositoryInterface_GetToyByID_Call) Return(toy *Toy, err error) *MockCatRepositoryInterface_GetToyByID_Call {
-	_c.Call.Return(toy, err)
-	return _c
-}
-
-func (_c *MockCatRepositoryInterface_GetToyByID_Call) RunAndReturn(run func(ctx context.Context, toyID *ToyID) (*Toy, error)) *MockCatRepositoryInterface_GetToyByID_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// GetToys provides a mock function for the type MockCatRepositoryInterface
-func (_mock *MockCatRepositoryInterface) GetToys(ctx context.Context, catID *CatID) ([]*Toy, error) {
-	ret := _mock.Called(ctx, catID)
-
-	if len(ret) == 0 {
-		panic("no return value specified for GetToys")
-	}
-
-	var r0 []*Toy
-	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *CatID) ([]*Toy, error)); ok {
-		return returnFunc(ctx, catID)
-	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *CatID) []*Toy); ok {
-		r0 = returnFunc(ctx, catID)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]*Toy)
-		}
-	}
-	if returnFunc, ok := ret.Get(1).(func(context.Context, *CatID) error); ok {
-		r1 = returnFunc(ctx, catID)
-	} else {
-		r1 = ret.Error(1)
-	}
-	return r0, r1
-}
-
-// MockCatRepositoryInterface_GetToys_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetToys'
-type MockCatRepositoryInterface_GetToys_Call struct {
-	*mock.Call
-}
-
-// GetToys is a helper method to define mock.On call
-//   - ctx context.Context
-//   - catID *CatID
-func (_e *MockCatRepositoryInterface_Expecter) GetToys(ctx interface{}, catID interface{}) *MockCatRepositoryInterface_GetToys_Call {
-	return &MockCatRepositoryInterface_GetToys_Call{Call: _e.mock.On("GetToys", ctx, catID)}
-}
-
-func (_c *MockCatRepositoryInterface_GetToys_Call) Run(run func(ctx context.Context, catID *CatID)) *MockCatRepositoryInterface_GetToys_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		var arg0 context.Context
-		if args[0] != nil {
-			arg0 = args[0].(context.Context)
-		}
-		var arg1 *CatID
-		if args[1] != nil {
-			arg1 = args[1].(*CatID)
-		}
-		run(
-			arg0,
-			arg1,
-		)
-	})
-	return _c
-}
-
-func (_c *MockCatRepositoryInterface_GetToys_Call) Return(toys []*Toy, err error) *MockCatRepositoryInterface_GetToys_Call {
-	_c.Call.Return(toys, err)
-	return _c
-}
-
-func (_c *MockCatRepositoryInterface_GetToys_Call) RunAndReturn(run func(ctx context.Context, catID *CatID) ([]*Toy, error)) *MockCatRepositoryInterface_GetToys_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// Search provides a mock function for the type MockCatRepositoryInterface
-func (_mock *MockCatRepositoryInterface) Search(ctx context.Context, params *CatSearchParams) ([]*Cat, error) {
+// CatSearch provides a mock function for the type MockCatRepositoryInterface
+func (_mock *MockCatRepositoryInterface) CatSearch(ctx context.Context, params *CatSearchParams) ([]*Cat, error) {
 	ret := _mock.Called(ctx, params)
 
 	if len(ret) == 0 {
-		panic("no return value specified for Search")
+		panic("no return value specified for CatSearch")
 	}
 
 	var r0 []*Cat
@@ -623,19 +367,19 @@ func (_mock *MockCatRepositoryInterface) Search(ctx context.Context, params *Cat
 	return r0, r1
 }
 
-// MockCatRepositoryInterface_Search_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Search'
-type MockCatRepositoryInterface_Search_Call struct {
+// MockCatRepositoryInterface_CatSearch_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CatSearch'
+type MockCatRepositoryInterface_CatSearch_Call struct {
 	*mock.Call
 }
 
-// Search is a helper method to define mock.On call
+// CatSearch is a helper method to define mock.On call
 //   - ctx context.Context
 //   - params *CatSearchParams
-func (_e *MockCatRepositoryInterface_Expecter) Search(ctx interface{}, params interface{}) *MockCatRepositoryInterface_Search_Call {
-	return &MockCatRepositoryInterface_Search_Call{Call: _e.mock.On("Search", ctx, params)}
+func (_e *MockCatRepositoryInterface_Expecter) CatSearch(ctx interface{}, params interface{}) *MockCatRepositoryInterface_CatSearch_Call {
+	return &MockCatRepositoryInterface_CatSearch_Call{Call: _e.mock.On("CatSearch", ctx, params)}
 }
 
-func (_c *MockCatRepositoryInterface_Search_Call) Run(run func(ctx context.Context, params *CatSearchParams)) *MockCatRepositoryInterface_Search_Call {
+func (_c *MockCatRepositoryInterface_CatSearch_Call) Run(run func(ctx context.Context, params *CatSearchParams)) *MockCatRepositoryInterface_CatSearch_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
@@ -653,12 +397,12 @@ func (_c *MockCatRepositoryInterface_Search_Call) Run(run func(ctx context.Conte
 	return _c
 }
 
-func (_c *MockCatRepositoryInterface_Search_Call) Return(cats []*Cat, err error) *MockCatRepositoryInterface_Search_Call {
+func (_c *MockCatRepositoryInterface_CatSearch_Call) Return(cats []*Cat, err error) *MockCatRepositoryInterface_CatSearch_Call {
 	_c.Call.Return(cats, err)
 	return _c
 }
 
-func (_c *MockCatRepositoryInterface_Search_Call) RunAndReturn(run func(ctx context.Context, params *CatSearchParams) ([]*Cat, error)) *MockCatRepositoryInterface_Search_Call {
+func (_c *MockCatRepositoryInterface_CatSearch_Call) RunAndReturn(run func(ctx context.Context, params *CatSearchParams) ([]*Cat, error)) *MockCatRepositoryInterface_CatSearch_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -726,6 +470,194 @@ func (_c *MockCatRepositoryInterface_ToyBelongs_Call) RunAndReturn(run func(ctx 
 	return _c
 }
 
+// ToyByID provides a mock function for the type MockCatRepositoryInterface
+func (_mock *MockCatRepositoryInterface) ToyByID(ctx context.Context, toyID *ToyID) (*Toy, error) {
+	ret := _mock.Called(ctx, toyID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for ToyByID")
+	}
+
+	var r0 *Toy
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *ToyID) (*Toy, error)); ok {
+		return returnFunc(ctx, toyID)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *ToyID) *Toy); ok {
+		r0 = returnFunc(ctx, toyID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*Toy)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *ToyID) error); ok {
+		r1 = returnFunc(ctx, toyID)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// MockCatRepositoryInterface_ToyByID_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ToyByID'
+type MockCatRepositoryInterface_ToyByID_Call struct {
+	*mock.Call
+}
+
+// ToyByID is a helper method to define mock.On call
+//   - ctx context.Context
+//   - toyID *ToyID
+func (_e *MockCatRepositoryInterface_Expecter) ToyByID(ctx interface{}, toyID interface{}) *MockCatRepositoryInterface_ToyByID_Call {
+	return &MockCatRepositoryInterface_ToyByID_Call{Call: _e.mock.On("ToyByID", ctx, toyID)}
+}
+
+func (_c *MockCatRepositoryInterface_ToyByID_Call) Run(run func(ctx context.Context, toyID *ToyID)) *MockCatRepositoryInterface_ToyByID_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 *ToyID
+		if args[1] != nil {
+			arg1 = args[1].(*ToyID)
+		}
+		run(
+			arg0,
+			arg1,
+		)
+	})
+	return _c
+}
+
+func (_c *MockCatRepositoryInterface_ToyByID_Call) Return(toy *Toy, err error) *MockCatRepositoryInterface_ToyByID_Call {
+	_c.Call.Return(toy, err)
+	return _c
+}
+
+func (_c *MockCatRepositoryInterface_ToyByID_Call) RunAndReturn(run func(ctx context.Context, toyID *ToyID) (*Toy, error)) *MockCatRepositoryInterface_ToyByID_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// ToyCreate provides a mock function for the type MockCatRepositoryInterface
+func (_mock *MockCatRepositoryInterface) ToyCreate(ctx context.Context, catID *CatID, data *ToyCreateRepo) error {
+	ret := _mock.Called(ctx, catID, data)
+
+	if len(ret) == 0 {
+		panic("no return value specified for ToyCreate")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *CatID, *ToyCreateRepo) error); ok {
+		r0 = returnFunc(ctx, catID, data)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// MockCatRepositoryInterface_ToyCreate_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ToyCreate'
+type MockCatRepositoryInterface_ToyCreate_Call struct {
+	*mock.Call
+}
+
+// ToyCreate is a helper method to define mock.On call
+//   - ctx context.Context
+//   - catID *CatID
+//   - data *ToyCreateRepo
+func (_e *MockCatRepositoryInterface_Expecter) ToyCreate(ctx interface{}, catID interface{}, data interface{}) *MockCatRepositoryInterface_ToyCreate_Call {
+	return &MockCatRepositoryInterface_ToyCreate_Call{Call: _e.mock.On("ToyCreate", ctx, catID, data)}
+}
+
+func (_c *MockCatRepositoryInterface_ToyCreate_Call) Run(run func(ctx context.Context, catID *CatID, data *ToyCreateRepo)) *MockCatRepositoryInterface_ToyCreate_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 *CatID
+		if args[1] != nil {
+			arg1 = args[1].(*CatID)
+		}
+		var arg2 *ToyCreateRepo
+		if args[2] != nil {
+			arg2 = args[2].(*ToyCreateRepo)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *MockCatRepositoryInterface_ToyCreate_Call) Return(err error) *MockCatRepositoryInterface_ToyCreate_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *MockCatRepositoryInterface_ToyCreate_Call) RunAndReturn(run func(ctx context.Context, catID *CatID, data *ToyCreateRepo) error) *MockCatRepositoryInterface_ToyCreate_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// ToyDelete provides a mock function for the type MockCatRepositoryInterface
+func (_mock *MockCatRepositoryInterface) ToyDelete(ctx context.Context, toyID *ToyID) error {
+	ret := _mock.Called(ctx, toyID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for ToyDelete")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *ToyID) error); ok {
+		r0 = returnFunc(ctx, toyID)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// MockCatRepositoryInterface_ToyDelete_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ToyDelete'
+type MockCatRepositoryInterface_ToyDelete_Call struct {
+	*mock.Call
+}
+
+// ToyDelete is a helper method to define mock.On call
+//   - ctx context.Context
+//   - toyID *ToyID
+func (_e *MockCatRepositoryInterface_Expecter) ToyDelete(ctx interface{}, toyID interface{}) *MockCatRepositoryInterface_ToyDelete_Call {
+	return &MockCatRepositoryInterface_ToyDelete_Call{Call: _e.mock.On("ToyDelete", ctx, toyID)}
+}
+
+func (_c *MockCatRepositoryInterface_ToyDelete_Call) Run(run func(ctx context.Context, toyID *ToyID)) *MockCatRepositoryInterface_ToyDelete_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 *ToyID
+		if args[1] != nil {
+			arg1 = args[1].(*ToyID)
+		}
+		run(
+			arg0,
+			arg1,
+		)
+	})
+	return _c
+}
+
+func (_c *MockCatRepositoryInterface_ToyDelete_Call) Return(err error) *MockCatRepositoryInterface_ToyDelete_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *MockCatRepositoryInterface_ToyDelete_Call) RunAndReturn(run func(ctx context.Context, toyID *ToyID) error) *MockCatRepositoryInterface_ToyDelete_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // ToyExists provides a mock function for the type MockCatRepositoryInterface
 func (_mock *MockCatRepositoryInterface) ToyExists(ctx context.Context, id *ToyID) error {
 	ret := _mock.Called(ctx, id)
@@ -779,6 +711,80 @@ func (_c *MockCatRepositoryInterface_ToyExists_Call) Return(err error) *MockCatR
 }
 
 func (_c *MockCatRepositoryInterface_ToyExists_Call) RunAndReturn(run func(ctx context.Context, id *ToyID) error) *MockCatRepositoryInterface_ToyExists_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// ToySearch provides a mock function for the type MockCatRepositoryInterface
+func (_mock *MockCatRepositoryInterface) ToySearch(ctx context.Context, catID *CatID, params *ToySearchParams) ([]*Toy, error) {
+	ret := _mock.Called(ctx, catID, params)
+
+	if len(ret) == 0 {
+		panic("no return value specified for ToySearch")
+	}
+
+	var r0 []*Toy
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *CatID, *ToySearchParams) ([]*Toy, error)); ok {
+		return returnFunc(ctx, catID, params)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *CatID, *ToySearchParams) []*Toy); ok {
+		r0 = returnFunc(ctx, catID, params)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*Toy)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *CatID, *ToySearchParams) error); ok {
+		r1 = returnFunc(ctx, catID, params)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// MockCatRepositoryInterface_ToySearch_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ToySearch'
+type MockCatRepositoryInterface_ToySearch_Call struct {
+	*mock.Call
+}
+
+// ToySearch is a helper method to define mock.On call
+//   - ctx context.Context
+//   - catID *CatID
+//   - params *ToySearchParams
+func (_e *MockCatRepositoryInterface_Expecter) ToySearch(ctx interface{}, catID interface{}, params interface{}) *MockCatRepositoryInterface_ToySearch_Call {
+	return &MockCatRepositoryInterface_ToySearch_Call{Call: _e.mock.On("ToySearch", ctx, catID, params)}
+}
+
+func (_c *MockCatRepositoryInterface_ToySearch_Call) Run(run func(ctx context.Context, catID *CatID, params *ToySearchParams)) *MockCatRepositoryInterface_ToySearch_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 *CatID
+		if args[1] != nil {
+			arg1 = args[1].(*CatID)
+		}
+		var arg2 *ToySearchParams
+		if args[2] != nil {
+			arg2 = args[2].(*ToySearchParams)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *MockCatRepositoryInterface_ToySearch_Call) Return(toys []*Toy, err error) *MockCatRepositoryInterface_ToySearch_Call {
+	_c.Call.Return(toys, err)
+	return _c
+}
+
+func (_c *MockCatRepositoryInterface_ToySearch_Call) RunAndReturn(run func(ctx context.Context, catID *CatID, params *ToySearchParams) ([]*Toy, error)) *MockCatRepositoryInterface_ToySearch_Call {
 	_c.Call.Return(run)
 	return _c
 }
