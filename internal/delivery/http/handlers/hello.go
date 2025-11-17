@@ -42,8 +42,8 @@ func (hh *HelloHandler) RegisterRoutes(rg *gin.RouterGroup) {
 //	@Description	get hello world
 //	@Tags			Hello
 //	@Produce		json
-//	@Success		200	{object}	models.Message
-//	@Failure		500	{object}	models.HTTPError
+//	@Success		200	{object}	dto.Message
+//	@Failure		500	{object}	dto.HTTPError
 //	@Router			/hello [GET]
 func (hh *HelloHandler) GetHelloMessage(c *gin.Context) {
 	hh.logger.Debug().Msg("Get hello message in handler")
